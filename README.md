@@ -5,7 +5,7 @@ unless the system breaks (which occurs often) or have some major changes.
 ##  License
 This project is distributed under GPLv3 by Mushinako. This project comes
 with absolutely NO warranty, and I am NOT responsible for any data loss
-and/or leak. ~~Please only test this script if you understand what you and
+and/or leak. I'm not an expert on data security (though trying to be). ~~Please only test this script if you understand what you and
 this script are doing!~~ Do not test this script now as the setup procedure
 is not completed yet!
 
@@ -29,8 +29,11 @@ The same file will not be overwritten, but different files with the same
 name (possibly different versions) will be renamed by attaching " (1)",
 " (2)", etc.
 
-### ARGUMENTS
+### Arguments
 -h, --help      Show this text
 -r, --reset     Force reset. "data.json" will be deleted and you will
                 need to re-setup. You may likely have to do this every
                 semester.
+
+##  Contributions!
+Absolutely! File an issue and/or start a pull request!
