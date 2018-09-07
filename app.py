@@ -73,7 +73,15 @@ def check_pw(pw_hash):
         sys.exit()
 
 
-def fetch():
+def setup_and_fetch(setup):
+    COURSES_LIST_PARA = ('?search=&pageSize=20&embedDepth=1'
+                         '&sort=-PinDate,OrgUnitName,OrgUnitId'
+                         '&parentOrganizations=&orgUnitTypeId=3'
+                         '&promotePins=false&autoPinCourses=true&roles='
+                         '&excludeEnded=false')
+    COURSES_INFO_PARA = '?embedDepth=1'
+
+
     with open('data.json', 'r') as json_data:
         data = json.loads(json_data.read())
     print('Configurations Successfully Read!')
@@ -85,41 +93,89 @@ def fetch():
     data_login['userName'] = cipher.decrypt(data_login['userName'])
     data_login['password'] = cipher.decrypt(data_login['password'])
 
+    urls = data['urls']
     session = Session()
     print('Session Started!')
 
     # Login from Main Page
     login = session.post(
-        url=data['urls']['login'],
-        data=data_login
+        url = urls['login'],
+        data = data_login
         )
     print('Successfully Logged In!')
 
-    # Get Oauth Token
-    token = session.post(
-        url=data['urls']['token'],
-        data=data['data']['token'],
-        headers={
-            'x-csrf-token': re.search(
-                b'\(\'XSRF.Token\',\'(\w{32})\'\);',
-                login.content
-                ).group(1)
+    if setup:
+        # Get Oauth Token
+        token = session.post(
+            url = urls['token'],
+            data = data['data']['token'],
+            headers = {
+                'x-csrf-token': re.search(
+                    b'\(\'XSRF.Token\',\'(\w{32})\'\);',
+                    login.content
+                    ).group(1)
+                }
+            )
+        tk = json.loads(token.content)['access_token']
+        print('OAuth Token Got!')
+
+        # Get Authorization
+        auth_js = session.get(url=urls['authjs'])
+        auth = re.search(
+            b'Authorization:\"(.*)\"\+n',
+            auth_js.content
+            ).group(1)
+
+        auth = auth.decode('utf-8') + tk
+        print('Authorization Got!')
+
+        # Get Enrollments URL
+        enroll_url = re.search(
+            b'enrollments-url=\"([\w\-\.:/]*)\"',
+            login.content
+            ).group(1)
+        print('Enrollments URL Got!')
+
+        # Get Courses List
+        courses_info = session.get(
+            url = enroll_url,
+            headers = {'authorization': auth}
+            )
+        courses_assess = json.loads(courses_info.content)['actions'][0]
+        courses_url = courses_assess['href']
+        courses_list = session.get(
+            url = courses_url + COURSES_LIST_PARA,
+            headers = {'authorization': auth}
+            )
+        courses_data = json.loads(courses_list.content)['entities']
+        courses_infopage = [
+            [
+                c['links'][1]['href'].split('/')[-1],
+                c['links'][1]['href'] + COURSES_INFO_PARA
+                ]
+            for c in courses_data
+            if c['class'][1] == 'pinned'
+            ]
+        print('Courses List Got!')
+
+        # Get Info for Each Course
+        courses_infodict = {}
+        for cour_id, cour_url in courses_infopage:
+            cour_info = session.get(
+                url = cour_url,
+                headers = {'authorization': auth}
+            )
+            cour_name = json.loads(cour_info.content)['properties']['name']
+            courses_infodict[cour_name] = {
+                'name': cour_name,
+                'no': cour_id
             }
-        )
-    tk = json.loads(token.content)['access_token']
+        print('Courses Info Got!')
 
-    # Get Authorization
-    auth_js = session.get(url=data['urls']['authjs'])
-    auth = re.search(
-        b'Authorization:\"(.*)\"\+n',
-        auth_js.content
-        ).group(1)
-
-    auth = auth.decode('utf-8') + tk
-    print('\n\n{}\n\n'.format(auth))
+        print('\n\n{}\n\n'.format(courses_infodict))
 
     # CSULB Page
-    csulb = session.get(url=data['urls']['csulb'])
+    csulb = session.get(url=urls['csulb'])
     la_init = re.search(
         b'salesforceliveagent.com/chat\', \'(\w{15})\', \'(\w{15})\'',
         csulb.content
@@ -128,11 +184,11 @@ def fetch():
         b'showWhenOnline\(\'(\w{15})\',',
         csulb.content
         )
-    print('LiveAgent Configurations Obtained!')
+    print('LiveAgent Configurations Got!')
 
     # LiveAgent Cookies
     la = session.get(
-        url=data['urls']['liveagent'].format(
+        url = urls['liveagent'].format(
             la_id.group(1).decode('utf-8'),
             la_init.group(1).decode('utf-8'),
             la_init.group(2).decode('utf-8')
@@ -145,109 +201,109 @@ def fetch():
         session.cookies.set(*x)
     print('LiveAgent Cookies Added!')
 
-    # # Iterate Thru Courses
-    # courses = json.loads(cipher.decrypt(data['courses']))
-    # for course, prop in courses.items():
-    #     print()
-    #     name = prop['name']
-    #     print('Downloading Content for {}...'.format(name))
-    #     # Create Folders as Necessary
-    #     temp_course = 'Temp\\{}'.format(name)
-    #     Path(temp_course).mkdir(parents=True)
-    #
-    #     #Content Download
-    #     dl_url = prop['dl']
-    #     if dl_url == '':
-    #         print('  No Contents!')
-    #     else:
-    #         print('  Downloading Contents...')
-    #         dl = session.get(url=dl_url)
-    #         zip_name = '{0}\\{1}.zip'.format(temp_course, name)
-    #         with open(zip_name, 'wb') as f:
-    #             f.write(dl.content)
-    #         print('  Contents Downloaded!')
-    #         print('  Extracting Contents...')
-    #         with ZipFile(zip_name, 'r') as z:
-    #             z.extractall(temp_course)
-    #         print('  Contents Extracted!')
-    #         os.remove(zip_name)
-    #
-    #     # Overview Download
-    #     ov_url = prop['info']
-    #     if ov_url == '':
-    #         print('  No Overview!')
-    #     else:
-    #         print('  Downloading Overview...')
-    #         ov = session.get(url=ov_url)
-    #         with open('{}\\Overview.pdf'.format(temp_course), 'wb') as f:
-    #             f.write(ov.content)
-    #         print('  Overview Downloaded!')
-    #
-    #     # Merge to Main Folder
-    #     print()
-    #     print('Merging {} to Main Folder...'.format(name))
-    #     main_course = 'Contents\\{}'.format(name)
-    #
-    #     # os.walk Returns [folder_name, sub_folders, sub_files]
-    #     for temp_folder, _, files in os.walk(temp_course):
-    #         rel_path = '\\'.join(temp_folder.split('\\')[1:])
-    #         print('  Merging Folder {}...'.format(rel_path))
-    #         print('  Files Present: {}'.format(files))
-    #         main_folder = '{0}\\{1}'.format(
-    #             main_course,
-    #             '\\'.join(temp_folder.split('\\')[2:])
-    #         )
-    #         Path(main_folder).mkdir(parents=True, exist_ok=True)
-    #
-    #         # Copy to Main Folder
-    #         for file in files:
-    #             print('    Merging File {0}\\{1}...'.format(rel_path, file))
-    #             temp_file = '{0}\\{1}'.format(temp_folder, file)
-    #             main_file = re.sub(' \(\d+\).', '.', '{0}\\{1}'.format(main_folder, file))
-    #             while main_file[0] == ' ':
-    #                 main_file = main_file[1:]
-    #
-    #             # Check If File With Same Name Exists
-    #             if os.path.isfile(main_file):
-    #                 print('      File Name Collision!')
-    #                 f_temp = FileData(temp_file)
-    #                 f_main = FileData(main_file)
-    #
-    #                 # If File with Same Name Exists, Check Size
-    #                 if f_temp.size == f_main.size:
-    #                     print('      File Size Collision!')
-    #                     f_temp.hash()
-    #                     f_main.hash()
-    #
-    #                     # If File with Same Size Exists, Check Hash
-    #                     assert None not in f_temp.hashes + f_main.hashes, 'Hash Calculations Failed!'
-    #                     if f_temp.md5 == f_main.md5 and f_temp.sha1 == f_main.sha1:
-    #                         print('      File Hash Collision!')
-    #                         os.remove(temp_file)
-    #                         print('      File Merged!')
-    #                         continue
-    #
-    #                 # If Same File Name with Different Sizes/Hashes, Rename New File with Appendixes
-    #                 old_file = main_file.split('.')
-    #                 num = 1
-    #
-    #                 # Try unused numbers
-    #                 while True:
-    #                     f = '{0} {1}.{2}'.format(
-    #                         '.'.join(old_file[:-1]),
-    #                         num,
-    #                         old_file[-1]
-    #                         )
-    #                     if os.path.exists(f):
-    #                         num += 1
-    #                     else:
-    #                         os.rename(temp_file, f)
-    #                         print('      File Renamed as {}!'.format(f))
-    #
-    #             # Directly Move the File If No File with the Same Name Exists
-    #             else:
-    #                 os.rename(temp_file, main_file)
-    #                 print('      File Copied!')
+    # Iterate Thru Courses
+    courses = json.loads(cipher.decrypt(data['courses']))
+    for course, prop in courses.items():
+        print()
+        name = prop['name']
+        print('Downloading Content for {}...'.format(name))
+        # Create Folders as Necessary
+        temp_course = 'Temp\\{}'.format(name)
+        Path(temp_course).mkdir(parents=True)
+
+        #Content Download
+        dl_url = prop['dl']
+        if dl_url == '':
+            print('  No Contents!')
+        else:
+            print('  Downloading Contents...')
+            dl = session.get(url=dl_url)
+            zip_name = '{0}\\{1}.zip'.format(temp_course, name)
+            with open(zip_name, 'wb') as f:
+                f.write(dl.content)
+            print('  Contents Downloaded!')
+            print('  Extracting Contents...')
+            with ZipFile(zip_name, 'r') as z:
+                z.extractall(temp_course)
+            print('  Contents Extracted!')
+            os.remove(zip_name)
+
+        # Overview Download
+        ov_url = prop['info']
+        if ov_url == '':
+            print('  No Overview!')
+        else:
+            print('  Downloading Overview...')
+            ov = session.get(url=ov_url)
+            with open('{}\\Overview.pdf'.format(temp_course), 'wb') as f:
+                f.write(ov.content)
+            print('  Overview Downloaded!')
+
+        # Merge to Main Folder
+        print()
+        print('Merging {} to Main Folder...'.format(name))
+        main_course = 'Contents\\{}'.format(name)
+
+        # os.walk Returns [folder_name, sub_folders, sub_files]
+        for temp_folder, _, files in os.walk(temp_course):
+            rel_path = '\\'.join(temp_folder.split('\\')[1:])
+            print('  Merging Folder {}...'.format(rel_path))
+            print('  Files Present: {}'.format(files))
+            main_folder = '{0}\\{1}'.format(
+                main_course,
+                '\\'.join(temp_folder.split('\\')[2:])
+            )
+            Path(main_folder).mkdir(parents=True, exist_ok=True)
+
+            # Copy to Main Folder
+            for file in files:
+                print('    Merging File {0}\\{1}...'.format(rel_path, file))
+                temp_file = '{0}\\{1}'.format(temp_folder, file)
+                main_file = re.sub(' \(\d+\).', '.', '{0}\\{1}'.format(main_folder, file))
+                while main_file[0] == ' ':
+                    main_file = main_file[1:]
+
+                # Check If File With Same Name Exists
+                if os.path.isfile(main_file):
+                    print('      File Name Collision!')
+                    f_temp = FileData(temp_file)
+                    f_main = FileData(main_file)
+
+                    # If File with Same Name Exists, Check Size
+                    if f_temp.size == f_main.size:
+                        print('      File Size Collision!')
+                        f_temp.hash()
+                        f_main.hash()
+
+                        # If File with Same Size Exists, Check Hash
+                        assert None not in f_temp.hashes + f_main.hashes, 'Hash Calculations Failed!'
+                        if f_temp.md5 == f_main.md5 and f_temp.sha1 == f_main.sha1:
+                            print('      File Hash Collision!')
+                            os.remove(temp_file)
+                            print('      File Merged!')
+                            continue
+
+                    # If Same File Name with Different Sizes/Hashes, Rename New File with Appendixes
+                    old_file = main_file.split('.')
+                    num = 1
+
+                    # Try unused numbers
+                    while True:
+                        f = '{0} {1}.{2}'.format(
+                            '.'.join(old_file[:-1]),
+                            num,
+                            old_file[-1]
+                            )
+                        if os.path.exists(f):
+                            num += 1
+                        else:
+                            os.rename(temp_file, f)
+                            print('      File Renamed as {}!'.format(f))
+
+                # Directly Move the File If No File with the Same Name Exists
+                else:
+                    os.rename(temp_file, main_file)
+                    print('      File Copied!')
 
     print()
 
@@ -292,19 +348,19 @@ def main():
     if len(sys.argv) == 1:
         if os.path.isfile('data.json'):
             try:
-                fetch()
+                setup_and_fetch(False)
             finally:
                 if os.path.isdir('Temp'):
                     rmtree('Temp')
                 print()
         # (FUTURE)
         # else:
-            # setup()
+            # setup_and_fetch(True)
     elif sys.argv[1] in ['-h', '--help']:
         print(HELP)
     # (FUTURE)
     # elif sys.argv[1] not in ['-r', '--reset']:
-    #     setup()
+    #     setup_and_fetch(True)
     else:
         raise ValueError('''
             Invalid arguments!

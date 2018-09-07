@@ -16,6 +16,8 @@ Python 3.6+
 Click on `app.bat` or run `app.bat [-h|-r]` from command line if you're using
 Windows. Use `python3 app.py [-h|-r]` on macOS or Linux.
 
+Please pin your courses that you would like to be downloaded.
+
 ~~[This program needs to be setup at the first time, asking you for your
 credentials, and a file named "data.json" should appear, storing
 necessary data. This file will refresh once every 5 times the program is
