@@ -74,7 +74,7 @@ def check_pw(pw_hash):
         sys.exit()
 
 
-def fetch():
+def setup_and_fetch():
     with open('data.json', 'r') as json_data:
         data = json.loads(json_data.read())
     print('Configurations Successfully Read!')
@@ -268,7 +268,7 @@ def main():
     if len(sys.argv) == 1:
         if os.path.isfile('data.json'):
             try:
-                fetch()
+                setup_and_fetch(False)
             except BadZipfile:
                 pass
             finally:
