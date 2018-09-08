@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import re
 import os
 import bcrypt
@@ -5,7 +6,7 @@ import sys
 import json
 from shutil import rmtree
 from getpass import getpass
-from zipfile import ZipFile
+from zipfile import ZipFile, BadZipfile
 from pathlib import Path
 from requests import Session
 from base64 import b64encode, b64decode
@@ -223,8 +224,11 @@ def setup_and_fetch(setup):
                 f.write(dl.content)
             print('  Contents Downloaded!')
             print('  Extracting Contents...')
-            with ZipFile(zip_name, 'r') as z:
-                z.extractall(temp_course)
+            try:
+                with ZipFile(zip_name, 'r') as z:
+                    z.extractall(temp_course)
+            except BadZipfile:
+                print('    Content for {} is not a Zip File!'.format(name))
             print('  Contents Extracted!')
             os.remove(zip_name)
 
@@ -349,6 +353,8 @@ def main():
         if os.path.isfile('data.json'):
             try:
                 setup_and_fetch(False)
+            except BadZipfile:
+                pass
             finally:
                 if os.path.isdir('Temp'):
                     rmtree('Temp')
