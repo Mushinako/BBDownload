@@ -75,14 +75,6 @@ def check_pw(pw_hash):
 
 
 def setup_and_fetch(setup):
-    COURSES_LIST_PARA = ('?search=&pageSize=20&embedDepth=1'
-                         '&sort=-PinDate,OrgUnitName,OrgUnitId'
-                         '&parentOrganizations=&orgUnitTypeId=3'
-                         '&promotePins=false&autoPinCourses=true&roles='
-                         '&excludeEnded=false')
-    COURSES_INFO_PARA = '?embedDepth=1'
-
-
     with open('data.json', 'r') as json_data:
         data = json.loads(json_data.read())
     print('Configurations Successfully Read!')
@@ -106,6 +98,13 @@ def setup_and_fetch(setup):
     print('Successfully Logged In!')
 
     if setup:
+        COURSES_LIST_PARA = ('?search=&pageSize=20&embedDepth=1'
+                             '&sort=-PinDate,OrgUnitName,OrgUnitId'
+                             '&parentOrganizations=&orgUnitTypeId=3'
+                             '&promotePins=false&autoPinCourses=true&roles='
+                             '&excludeEnded=false')
+        COURSES_INFO_PARA = '?embedDepth=1'
+
         # Get Oauth Token
         token = session.post(
             url = urls['token'],
