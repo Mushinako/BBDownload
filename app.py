@@ -270,7 +270,7 @@ def main():
             try:
                 fetch()
             except BadZipfile:
-                print('')
+                pass
             finally:
                 if os.path.isdir('Temp'):
                     rmtree('Temp')
