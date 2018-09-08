@@ -74,7 +74,7 @@ def check_pw(pw_hash):
         sys.exit()
 
 
-def setup_and_fetch():
+def setup_and_fetch(setup):
     with open('data.json', 'r') as json_data:
         data = json.loads(json_data.read())
     print('Configurations Successfully Read!')
