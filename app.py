@@ -97,7 +97,7 @@ def setup_and_fetch(setup):
         )
     print('Successfully Logged In!')
 
-    if setup:
+    if True:   # TODO: setup
         COURSES_LIST_PARA = ('?search=&pageSize=20&embedDepth=1'
                              '&sort=-PinDate,OrgUnitName,OrgUnitId'
                              '&parentOrganizations=&orgUnitTypeId=3'
@@ -141,19 +141,17 @@ def setup_and_fetch(setup):
             url = enroll_url,
             headers = {'authorization': auth}
             )
-        courses_assess = json.loads(courses_info.content)['actions'][0]
-        courses_url = courses_assess['href']
+        courses_url = json.loads(courses_info.content)['actions'][0]['href']
         courses_list = session.get(
             url = courses_url + COURSES_LIST_PARA,
             headers = {'authorization': auth}
             )
-        courses_data = json.loads(courses_list.content)['entities']
         courses_infopage = [
             [
                 c['links'][1]['href'].split('/')[-1],
                 c['links'][1]['href'] + COURSES_INFO_PARA
                 ]
-            for c in courses_data
+            for c in json.loads(courses_list.content)['entities']
             if c['class'][1] == 'pinned'
             ]
         print('Courses List Got!')
@@ -166,13 +164,16 @@ def setup_and_fetch(setup):
                 headers = {'authorization': auth}
             )
             cour_name = json.loads(cour_info.content)['properties']['name']
-            courses_infodict[cour_name] = {
+            courses_infodict[cour_id] = {
                 'name': cour_name,
                 'no': cour_id
             }
-        print('Courses Info Got!')
+            print('Courses Info for {} Got!'.format(cour_name))
 
-        print('\n\n{}\n\n'.format(courses_infodict))
+            course_content = session.get(url=urls['content'].format(cour_id))
+            print('\n{}\n'.format(course_content.content))
+
+        # print('\n\n{}\n\n'.format(courses_infodict))
 
     # CSULB Page
     csulb = session.get(url=urls['csulb'])
@@ -201,121 +202,121 @@ def setup_and_fetch(setup):
         session.cookies.set(*x)
     print('LiveAgent Cookies Added!')
 
-    # Iterate Thru Courses
-    courses = json.loads(cipher.decrypt(data['courses']))
-    for course, prop in courses.items():
-        print()
-        name = prop['name']
-        print('Downloading Content for {}...'.format(name))
-        # Create Folders as Necessary
-        temp_course = 'Temp\\{}'.format(name)
-        Path(temp_course).mkdir(parents=True)
-
-        #Content Download
-        dl_url = prop['dl']
-        if dl_url == '':
-            print('  No Contents!')
-        else:
-            print('  Downloading Contents...')
-            dl = session.get(url=dl_url)
-            zip_name = '{0}\\{1}.zip'.format(temp_course, name)
-            with open(zip_name, 'wb') as f:
-                f.write(dl.content)
-            print('  Contents Downloaded!')
-            print('  Extracting Contents...')
-            try:
-                with ZipFile(zip_name, 'r') as z:
-                    z.extractall(temp_course)
-            except BadZipfile:
-                print('    Content for {} is not a Zip File!'.format(name))
-            print('  Contents Extracted!')
-            os.remove(zip_name)
-
-        # Overview Download
-        ov_url = prop['info']
-        if ov_url == '':
-            print('  No Overview!')
-        else:
-            print('  Downloading Overview...')
-            ov = session.get(url=ov_url)
-            with open('{}\\Overview.pdf'.format(temp_course), 'wb') as f:
-                f.write(ov.content)
-            print('  Overview Downloaded!')
-
-        # Merge to Main Folder
-        print()
-        print('Merging {} to Main Folder...'.format(name))
-        main_course = 'Contents\\{}'.format(name)
-
-        # os.walk Returns [folder_name, sub_folders, sub_files]
-        for temp_folder, _, files in os.walk(temp_course):
-            rel_path = '\\'.join(temp_folder.split('\\')[1:])
-            print('  Merging Folder {}...'.format(rel_path))
-            print('  Files Present: {}'.format(files))
-            main_folder = '{0}\\{1}'.format(
-                main_course,
-                '\\'.join(temp_folder.split('\\')[2:])
-            )
-            Path(main_folder).mkdir(parents=True, exist_ok=True)
-
-            # Copy to Main Folder
-            for file in files:
-                print('    Merging File {0}\\{1}...'.format(rel_path, file))
-                temp_file = '{0}\\{1}'.format(temp_folder, file)
-                main_file = re.sub(' \(\d+\).', '.', '{0}\\{1}'.format(main_folder, file))
-                while main_file[0] == ' ':
-                    main_file = main_file[1:]
-
-                # Check If File With Same Name Exists
-                if os.path.isfile(main_file):
-                    print('      File Name Collision!')
-                    f_temp = FileData(temp_file)
-                    f_main = FileData(main_file)
-
-                    # If File with Same Name Exists, Check Size
-                    if f_temp.size == f_main.size:
-                        print('      File Size Collision!')
-                        f_temp.hash()
-                        f_main.hash()
-
-                        # If File with Same Size Exists, Check Hash
-                        assert None not in f_temp.hashes + f_main.hashes, 'Hash Calculations Failed!'
-                        if f_temp.md5 == f_main.md5 and f_temp.sha1 == f_main.sha1:
-                            print('      File Hash Collision!')
-                            os.remove(temp_file)
-                            print('      File Merged!')
-                            continue
-
-                    # If Same File Name with Different Sizes/Hashes, Rename New File with Appendixes
-                    old_file = main_file.split('.')
-                    num = 1
-
-                    # Try unused numbers
-                    while True:
-                        f = '{0} {1}.{2}'.format(
-                            '.'.join(old_file[:-1]),
-                            num,
-                            old_file[-1]
-                            )
-                        if os.path.exists(f):
-                            num += 1
-                        else:
-                            os.rename(temp_file, f)
-                            print('      File Renamed as {}!'.format(f))
-
-                # Directly Move the File If No File with the Same Name Exists
-                else:
-                    os.rename(temp_file, main_file)
-                    print('      File Copied!')
-
-    print()
-
-    # Get Rid of Empty Folders, Lazy Method
-    for _ in range(2):
-        for dirpath, directories, files in os.walk('Contents', topdown=False):
-            if not directories and not files:
-                os.rmdir(dirpath)
-    print('Empty Folders Cleared!')
+    # # Iterate Thru Courses
+    # courses = json.loads(cipher.decrypt(data['courses']))
+    # for course, prop in courses.items():
+    #     print()
+    #     name = prop['name']
+    #     print('Downloading Content for {}...'.format(name))
+    #     # Create Folders as Necessary
+    #     temp_course = 'Temp\\{}'.format(name)
+    #     Path(temp_course).mkdir(parents=True)
+    #
+    #     #Content Download
+    #     dl_url = prop['dl']
+    #     if dl_url == '':
+    #         print('  No Contents!')
+    #     else:
+    #         print('  Downloading Contents...')
+    #         dl = session.get(url=dl_url)
+    #         zip_name = '{0}\\{1}.zip'.format(temp_course, name)
+    #         with open(zip_name, 'wb') as f:
+    #             f.write(dl.content)
+    #         print('  Contents Downloaded!')
+    #         print('  Extracting Contents...')
+    #         try:
+    #             with ZipFile(zip_name, 'r') as z:
+    #                 z.extractall(temp_course)
+    #         except BadZipfile:
+    #             print('    Content for {} is not a Zip File!'.format(name))
+    #         print('  Contents Extracted!')
+    #         os.remove(zip_name)
+    #
+    #     # Overview Download
+    #     ov_url = prop['info']
+    #     if ov_url == '':
+    #         print('  No Overview!')
+    #     else:
+    #         print('  Downloading Overview...')
+    #         ov = session.get(url=ov_url)
+    #         with open('{}\\Overview.pdf'.format(temp_course), 'wb') as f:
+    #             f.write(ov.content)
+    #         print('  Overview Downloaded!')
+    #
+    #     # Merge to Main Folder
+    #     print()
+    #     print('Merging {} to Main Folder...'.format(name))
+    #     main_course = 'Contents\\{}'.format(name)
+    #
+    #     # os.walk Returns [folder_name, sub_folders, sub_files]
+    #     for temp_folder, _, files in os.walk(temp_course):
+    #         rel_path = '\\'.join(temp_folder.split('\\')[1:])
+    #         print('  Merging Folder {}...'.format(rel_path))
+    #         print('  Files Present: {}'.format(files))
+    #         main_folder = '{0}\\{1}'.format(
+    #             main_course,
+    #             '\\'.join(temp_folder.split('\\')[2:])
+    #         )
+    #         Path(main_folder).mkdir(parents=True, exist_ok=True)
+    #
+    #         # Copy to Main Folder
+    #         for file in files:
+    #             print('    Merging File {0}\\{1}...'.format(rel_path, file))
+    #             temp_file = '{0}\\{1}'.format(temp_folder, file)
+    #             main_file = re.sub(' \(\d+\).', '.', '{0}\\{1}'.format(main_folder, file))
+    #             while main_file[0] == ' ':
+    #                 main_file = main_file[1:]
+    #
+    #             # Check If File With Same Name Exists
+    #             if os.path.isfile(main_file):
+    #                 print('      File Name Collision!')
+    #                 f_temp = FileData(temp_file)
+    #                 f_main = FileData(main_file)
+    #
+    #                 # If File with Same Name Exists, Check Size
+    #                 if f_temp.size == f_main.size:
+    #                     print('      File Size Collision!')
+    #                     f_temp.hash()
+    #                     f_main.hash()
+    #
+    #                     # If File with Same Size Exists, Check Hash
+    #                     assert None not in f_temp.hashes + f_main.hashes, 'Hash Calculations Failed!'
+    #                     if f_temp.md5 == f_main.md5 and f_temp.sha1 == f_main.sha1:
+    #                         print('      File Hash Collision!')
+    #                         os.remove(temp_file)
+    #                         print('      File Merged!')
+    #                         continue
+    #
+    #                 # If Same File Name with Different Sizes/Hashes, Rename New File with Appendixes
+    #                 old_file = main_file.split('.')
+    #                 num = 1
+    #
+    #                 # Try unused numbers
+    #                 while True:
+    #                     f = '{0} {1}.{2}'.format(
+    #                         '.'.join(old_file[:-1]),
+    #                         num,
+    #                         old_file[-1]
+    #                         )
+    #                     if os.path.exists(f):
+    #                         num += 1
+    #                     else:
+    #                         os.rename(temp_file, f)
+    #                         print('      File Renamed as {}!'.format(f))
+    #
+    #             # Directly Move the File If No File with the Same Name Exists
+    #             else:
+    #                 os.rename(temp_file, main_file)
+    #                 print('      File Copied!')
+    #
+    # print()
+    #
+    # # Get Rid of Empty Folders, Lazy Method
+    # for _ in range(2):
+    #     for dirpath, directories, files in os.walk('Contents', topdown=False):
+    #         if not directories and not files:
+    #             os.rmdir(dirpath)
+    # print('Empty Folders Cleared!')
 
 
 def main():

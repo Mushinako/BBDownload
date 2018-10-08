@@ -2,6 +2,7 @@
     "expires": "5",
     "hash": "$2b$12$hOIamWxExZUk4Cdyfljw0.nTEW7.8CUloGYvq1fIe8hh8hCZDu91G",
     "urls": {
+        "content": "https://bbcsulb.desire2learn.com/d2l/le/content/{}/Home",
         "login": "https://bbcsulb.desire2learn.com/d2l/lp/auth/login/login.d2l",
         "token": "https://bbcsulb.desire2learn.com/d2l/lp/auth/oauth2/token",
         "authjs": "https://s.brightspace.com/lib/d2lfetch-auth/0.9.0/d2lfetch-auth.js",
