@@ -1,81 +1,98 @@
 #!/usr/bin/env python3
 import re
 import os
-import bcrypt
 import sys
 import json
 from shutil import rmtree
-from getpass import getpass
 from zipfile import ZipFile, BadZipfile
 from pathlib import Path
 from requests import Session
-from base64 import b64encode, b64decode
-from hashlib import sha256, md5, sha1
-from Crypto import Random
-from Crypto.Cipher import AES
+
+# from filedata import FileData
+# from pwd import AESCipher, check_pw
 
 
-class AESCipher:
-    def __init__(self, key):
-        self.key = sha256(key).digest()
+def setup():
+    COURSES_LIST_PARA = ('?search=&pageSize=20&embedDepth=1'
+                         '&sort=-PinDate,OrgUnitName,OrgUnitId'
+                         '&parentOrganizations=&orgUnitTypeId=3'
+                         '&promotePins=false&autoPinCourses=true&roles='
+                         '&excludeEnded=false')
+    COURSES_INFO_PARA = '?embedDepth=1'
 
-    def encrypt(self, data):
-        iv = Random.new().read(AES.block_size)
-        c = AES.new(self.key, AES.MODE_CBC, iv)
-        return b64encode(iv + c.encrypt(self._pad(data).encode('utf-8')))
+    # Get Oauth Token
+    token = session.post(
+        url = urls['token'],
+        data = data['data']['token'],
+        headers = {
+            'x-csrf-token': re.search(
+                b'\(\'XSRF.Token\',\'(\w{32})\'\);',
+                login.content
+                ).group(1)
+            }
+        )
+    tk = json.loads(token.content)['access_token']
+    print('OAuth Token Got!')
 
-    def decrypt(self, data):
-        data = b64decode(data)
-        c = AES.new(self.key, AES.MODE_CBC, data[:AES.block_size])
-        return self._unpad(c.decrypt(data[AES.block_size:])).decode('utf-8')
+    # Get Authorization
+    auth_js = session.get(url=urls['authjs'])
+    auth = re.search(
+        b'Authorization:\"(.*)\"\+n',
+        auth_js.content
+        ).group(1)
 
-    def _pad(self, data):
-        k = AES.block_size - len(data) % AES.block_size
-        return data + k * chr(k)
+    auth = auth.decode('utf-8') + tk
+    print('Authorization Got!')
 
-    @staticmethod
-    def _unpad(data):
-        return data[:-data[-1]]
+    # Get Enrollments URL
+    enroll_url = re.search(
+        b'enrollments-url=\"([\w\-\.:/]*)\"',
+        login.content
+        ).group(1)
+    print('Enrollments URL Got!')
 
+    # Get Courses List
+    courses_info = session.get(
+        url = enroll_url,
+        headers = {'authorization': auth}
+        )
+    courses_url = json.loads(courses_info.content)['actions'][0]['href']
+    courses_list = session.get(
+        url = courses_url + COURSES_LIST_PARA,
+        headers = {'authorization': auth}
+        )
+    courses_infopage = [
+        [
+            c['links'][1]['href'].split('/')[-1],
+            c['links'][1]['href'] + COURSES_INFO_PARA
+            ]
+        for c in json.loads(courses_list.content)['entities']
+        if c['class'][1] == 'pinned'
+        ]
+    print('Courses List Got!')
 
-class FileData:
-    def __init__(self, path):
-        self.path = path
-        self.size = os.stat(path).st_size
-        self.md5 = None
-        self.sha1 = None
-        self.hashes = None
+    # Get Info for Each Course
+    courses_infodict = {}
+    for cour_id, cour_url in courses_infopage:
+        cour_info = session.get(
+            url = cour_url,
+            headers = {'authorization': auth}
+        )
+        cour_name = json.loads(cour_info.content)['properties']['name']
+        courses_infodict[cour_id] = {
+            'name': cour_name,
+            'no': cour_id
+        }
+        print('Courses Info for {} Got!'.format(cour_name))
 
-    def hash(self):
-        m = md5()
-        s = sha1()
-        with open(self.path, 'rb') as f:
-            while True:
-                data = f.read(65536)
-                if not data:
-                    break
-                m.update(data)
-                s.update(data)
-        self.md5 = m.hexdigest()
-        self.sha1 = s.hexdigest()
-        self.hashes = [self.md5, self.sha1]
+        course_content = session.get(url=urls['content'].format(cour_id))
+        print('\n{}\n'.format(course_content.content))
 
-
-def check_pw(pw_hash):
-    pw = getpass().encode('utf-8')
-    hashed = pw_hash.encode('utf-8')
-    print()
-
-    if hashed == bcrypt.hashpw(pw, hashed):
-        return pw
-    else:
-        print('Password no match!')
-        print('Make sure you use the password set up in this app!')
-        sys.exit()
+    # print('\n\n{}\n\n'.format(courses_infodict))
 
 
 def setup_and_fetch(setup):
-    with open('data.json', 'r') as json_data:
+    with open('./data/data.json', 'r') as json_data:
         data = json.loads(json_data.read())
     print('Configurations Successfully Read!')
 
@@ -97,83 +114,8 @@ def setup_and_fetch(setup):
         )
     print('Successfully Logged In!')
 
-    if True:   # TODO: setup
-        COURSES_LIST_PARA = ('?search=&pageSize=20&embedDepth=1'
-                             '&sort=-PinDate,OrgUnitName,OrgUnitId'
-                             '&parentOrganizations=&orgUnitTypeId=3'
-                             '&promotePins=false&autoPinCourses=true&roles='
-                             '&excludeEnded=false')
-        COURSES_INFO_PARA = '?embedDepth=1'
-
-        # Get Oauth Token
-        token = session.post(
-            url = urls['token'],
-            data = data['data']['token'],
-            headers = {
-                'x-csrf-token': re.search(
-                    b'\(\'XSRF.Token\',\'(\w{32})\'\);',
-                    login.content
-                    ).group(1)
-                }
-            )
-        tk = json.loads(token.content)['access_token']
-        print('OAuth Token Got!')
-
-        # Get Authorization
-        auth_js = session.get(url=urls['authjs'])
-        auth = re.search(
-            b'Authorization:\"(.*)\"\+n',
-            auth_js.content
-            ).group(1)
-
-        auth = auth.decode('utf-8') + tk
-        print('Authorization Got!')
-
-        # Get Enrollments URL
-        enroll_url = re.search(
-            b'enrollments-url=\"([\w\-\.:/]*)\"',
-            login.content
-            ).group(1)
-        print('Enrollments URL Got!')
-
-        # Get Courses List
-        courses_info = session.get(
-            url = enroll_url,
-            headers = {'authorization': auth}
-            )
-        courses_url = json.loads(courses_info.content)['actions'][0]['href']
-        courses_list = session.get(
-            url = courses_url + COURSES_LIST_PARA,
-            headers = {'authorization': auth}
-            )
-        courses_infopage = [
-            [
-                c['links'][1]['href'].split('/')[-1],
-                c['links'][1]['href'] + COURSES_INFO_PARA
-                ]
-            for c in json.loads(courses_list.content)['entities']
-            if c['class'][1] == 'pinned'
-            ]
-        print('Courses List Got!')
-
-        # Get Info for Each Course
-        courses_infodict = {}
-        for cour_id, cour_url in courses_infopage:
-            cour_info = session.get(
-                url = cour_url,
-                headers = {'authorization': auth}
-            )
-            cour_name = json.loads(cour_info.content)['properties']['name']
-            courses_infodict[cour_id] = {
-                'name': cour_name,
-                'no': cour_id
-            }
-            print('Courses Info for {} Got!'.format(cour_name))
-
-            course_content = session.get(url=urls['content'].format(cour_id))
-            print('\n{}\n'.format(course_content.content))
-
-        # print('\n\n{}\n\n'.format(courses_infodict))
+    if setup:   # TODO: setup
+        setup()
 
     # CSULB Page
     csulb = session.get(url=urls['csulb'])
@@ -350,7 +292,7 @@ def main():
     '''
 
     if len(sys.argv) == 1:
-        if os.path.isfile('data.json'):
+        if os.path.isfile('data/data.json'):
             try:
                 setup_and_fetch(False)
             except BadZipfile:
