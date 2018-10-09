@@ -92,57 +92,57 @@ def setup():
 
 
 def setup_and_fetch(setup):
-    with open('./data/data.json', 'r') as json_data:
-        data = json.loads(json_data.read())
-    print('Configurations Successfully Read!')
-
-    pw = check_pw(data['hash'])
-
-    data_login = data['data']['login']
-    cipher = AESCipher(pw)
-    data_login['userName'] = cipher.decrypt(data_login['userName'])
-    data_login['password'] = cipher.decrypt(data_login['password'])
-
-    urls = data['urls']
-    session = Session()
-    print('Session Started!')
+    # with open('./data/data.json', 'r') as json_data:
+    #     data = json.loads(json_data.read())
+    # print('Configurations Successfully Read!')
+    #
+    # pw = check_pw(data['hash'])
+    #
+    # data_login = data['data']['login']
+    # cipher = AESCipher(pw)
+    # data_login['userName'] = cipher.decrypt(data_login['userName'])
+    # data_login['password'] = cipher.decrypt(data_login['password'])
+    #
+    # urls = data['urls']
+    # session = Session()
+    # print('Session Started!')
 
     # Login from Main Page
-    login = session.post(
-        url = urls['login'],
-        data = data_login
-        )
-    print('Successfully Logged In!')
+    # login = session.post(
+    #     url = urls['login'],
+    #     data = data_login
+    #     )
+    # print('Successfully Logged In!')
 
     if setup:   # TODO: setup
         setup()
 
     # CSULB Page
-    csulb = session.get(url=urls['csulb'])
-    la_init = re.search(
-        b'salesforceliveagent.com/chat\', \'(\w{15})\', \'(\w{15})\'',
-        csulb.content
-        )
-    la_id = re.search(
-        b'showWhenOnline\(\'(\w{15})\',',
-        csulb.content
-        )
-    print('LiveAgent Configurations Got!')
+    # csulb = session.get(url=urls['csulb'])
+    # la_init = re.search(
+    #     b'salesforceliveagent.com/chat\', \'(\w{15})\', \'(\w{15})\'',
+    #     csulb.content
+    #     )
+    # la_id = re.search(
+    #     b'showWhenOnline\(\'(\w{15})\',',
+    #     csulb.content
+    #     )
+    # print('LiveAgent Configurations Got!')
 
     # LiveAgent Cookies
-    la = session.get(
-        url = urls['liveagent'].format(
-            la_id.group(1).decode('utf-8'),
-            la_init.group(1).decode('utf-8'),
-            la_init.group(2).decode('utf-8')
-            )
-        )
-    la_ck = data['cookies']['liveagent']
-    ssid = json.loads(la.content[27:-2])['messages'][0]['message']['sessionId']
-    la_ck['liveagent_ptid'] = la_ck['liveagent_sid'] = ssid
-    for x in la_ck.items():
-        session.cookies.set(*x)
-    print('LiveAgent Cookies Added!')
+    # la = session.get(
+    #     url = urls['liveagent'].format(
+    #         la_id.group(1).decode('utf-8'),
+    #         la_init.group(1).decode('utf-8'),
+    #         la_init.group(2).decode('utf-8')
+    #         )
+    #     )
+    # la_ck = data['cookies']['liveagent']
+    # ssid = json.loads(la.content[27:-2])['messages'][0]['message']['sessionId']
+    # la_ck['liveagent_ptid'] = la_ck['liveagent_sid'] = ssid
+    # for x in la_ck.items():
+    #     session.cookies.set(*x)
+    # print('LiveAgent Cookies Added!')
 
     # # Iterate Thru Courses
     # courses = json.loads(cipher.decrypt(data['courses']))
