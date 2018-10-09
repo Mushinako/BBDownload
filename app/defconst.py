@@ -1,5 +1,4 @@
 EXPIRES = '5'
-HASH = '$2b$12$hOIamWxExZUk4Cdyfljw0.nTEW7.8CUloGYvq1fIe8hh8hCZDu91G'
 
 URL = {
     'LOGIN'       = 'https://bbcsulb.desire2learn.com/d2l/lp/auth/login/login.d2l',

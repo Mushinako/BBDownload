@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
-from os import stat
+import os
+import hashlib
 from hashlib import md5, sha1
 
 
 class FileData:
     def __init__(self, path):
         self.path = path
-        self.size = stat(path).st_size
+        self.size = os.stat(path).st_size
         self.md5 = None
         self.sha1 = None
         self.hashes = None
 
     def hash(self):
-        m = md5()
-        s = sha1()
+        m = hashlib.md5()
+        s = hashlib.sha1()
         with open(self.path, 'rb') as f:
             while True:
                 data = f.read(65536)

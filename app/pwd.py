@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
-from sys import exit
-from base64 import b64encode, b64decode
-from hashlib import sha256
+import sys
+import base64
+import hashlib
+import bcrypt
+from getpass import getpass
 from Crypto import Random
 from Crypto.Cipher import AES
-from getpass import getpass
-from bcrypt import hashpw
 
 
 class AESCipher:
     def __init__(self, key):
-        self.key = sha256(key).digest()
+        self.key = hashlib.sha256(key).digest()
 
     def encrypt(self, data):
         iv = Random.new().read(AES.block_size)
         c = AES.new(self.key, AES.MODE_CBC, iv)
-        return b64encode(iv + c.encrypt(self._pad(data).encode('utf-8')))
+        return base64.b64encode(iv + c.encrypt(self._pad(data).encode('utf-8')))
 
     def decrypt(self, data):
-        data = b64decode(data)
+        data = base64.b64decode(data)
         c = AES.new(self.key, AES.MODE_CBC, data[:AES.block_size])
         return self._unpad(c.decrypt(data[AES.block_size:])).decode('utf-8')
 
@@ -36,9 +36,9 @@ def check_pw(pw_hash):
     hashed = pw_hash.encode('utf-8')
     print()
 
-    if hashed == hashpw(pw, hashed):
+    if hashed == bcrypt.hashpw(pw, hashed):
         return pw
     else:
         print('Password no match!')
         print('Make sure you use the password set up in this app!')
-        exit()
+        sys.exit()
