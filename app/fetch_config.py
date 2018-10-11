@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import re
 import json
 import requests
 
@@ -9,39 +10,39 @@ import pwd
 # Read Personal Data from JSON
 def read_personal_data(json_file):
     with open(json_file, 'r') as pd:
-        personal_data = json.loads(pd.read())
+        defconst.data = json.loads(pd.read())
 
     print('Personal Data Successfully Read!')
-    return personal_data
 
 
 # Decrypt Login Data
-def decrypt_login(data):
-    pw = pwd.check_pw(data['hash'])
-    cipher = pwd.AESCipher(pw)
+def decrypt_login():
+    pwd.create_cipher()
 
-    data_login = data['login']
-    data_login['userName'] = cipher.decrypt(data_login['userName'])
-    data_login['password'] = cipher.decrypt(data_login['password'])
+    data_login = defconst.data['login']
+    data_login['userName'] = defconst.cipher.decrypt(data_login['userName'])
+    data_login['password'] = defconst.cipher.decrypt(data_login['password'])
 
     print('Configurations Successfully Decrypted!')
-    return data_login
 
 
 # Login from Main Page
-def bb_login(data_login):
-    login = session.post(
+def bb_login():
+    print('Successfully Logged In!')
+    return defconst.session.post(
         url  = defconst.url['login'],
-        data = data_login
+        data = defconst.data['login']
     )
 
-    print('Successfully Logged In!')
-    return login
+
+# Clear Login-Related Information
+def clear_login():
+    defconst.data['login'] = {}
 
 
 # LiveAgent Cookies
 def la_cookie():
-    csulb = session.get(url=defconst.url['csulb_html'])
+    csulb = defconst.session.get(url=defconst.url['csulb_html'])
     la_id = re.search(
         b'showWhenOnline\(\'(\w{15})\',',
         csulb.content
@@ -53,7 +54,7 @@ def la_cookie():
 
     print('LiveAgent Configurations Got!')
 
-    la = session.get(url=defconst.url['liveagent'].format(
+    la = defconst.session.get(url=defconst.url['liveagent'].format(
         la_id.group(1).decode('utf-8'),
         la_init.group(1).decode('utf-8'),
         la_init.group(2).decode('utf-8')
@@ -63,27 +64,21 @@ def la_cookie():
     la_ck = defconst.la_cookies
     la_ck['liveagent_sid'] = la_ck['liveagent_ptid'] = ssid
     for x in la_ck.items():
-        session.cookies.set(*x)
+        defconst.session.cookies.set(*x)
 
     print('LiveAgent Cookies Added!')
 
 
-def fetch():
-    personal_data = read_personal_data('data/data.json')
-    data_login = decrypt_login(personal_data)
+# Fetch the Cookies and Configs
+def fetch_config():
+    read_personal_data('data/data.json')
 
-    session = requests.Session()
+    defconst.session = requests.Session()
     print('Session Started!')
 
-    login = bb_login(data_login)
+    decrypt_login()
+    login = bb_login()
+    clear_login()
     la_cookie()
 
-
-def main(): # TODO: Other implementations
-    fetch()
-
-
-session = None
-
-if __name__ == '__main__':
-    main()
+    return login

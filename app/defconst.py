@@ -36,3 +36,7 @@ la_cookies = {
     'liveagent_sid' : '',
     'liveagent_vc'  : '2'
 }
+
+session = None
+data = None
+cipher = None

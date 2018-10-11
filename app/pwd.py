@@ -8,6 +8,9 @@ from Crypto import Random
 from Crypto.Cipher import AES
 
 
+import defconst
+
+
 class AESCipher:
     def __init__(self, key):
         self.key = hashlib.sha256(key).digest()
@@ -42,3 +45,9 @@ def check_pw(pw_hash):
         print('Password no match!')
         print('Make sure you use the password set up in this app!')
         sys.exit()
+
+
+# Create and Return Cipher
+def create_cipher():
+    if defconst.cipher is None:
+        defconst.cipher = AESCipher(check_pw(defconst.data['hash']))
