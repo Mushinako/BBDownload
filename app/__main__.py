@@ -34,9 +34,11 @@ def main(): # TODO: Other implementations
 
     ARGUMENTS:
     -h, --help      Show this text
+    -c, --course    Refresh course URLs. You may likely have to do this every
+                    time the instructor changes anything on BB
     -r, --reset     Force reset. "data.json" will be deleted and you will
-                    need to re-setup. You may likely have to do this every
-                    semester.
+                    need to re-setup. You'll have to do this if you lose your
+                    passphrase for this app.
     '''
 
     if len(sys.argv) == 1:

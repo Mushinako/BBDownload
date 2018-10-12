@@ -43,7 +43,7 @@ def dl_content(temp_course, name):
                 z.extractall(temp_course)
         except zipfile.BadZipFile:
             print('    Content for {} is not a ZipFile!'.format(name))
-            print('      Try Refreshing URLs with -f')
+            print('      Try Refreshing URLs with -c')
         else:
             print('  Contents Extracted!')
         finally:
@@ -66,6 +66,27 @@ def dl_overview(temp_course):
         print('  Overview Downloaded!')
 
 
+# Check File Collision
+def check_collision(f_temp, f_main, temp_file):
+    # If File with Same Name Exists, Check Size
+    if f_temp.size == f_main.size:
+        print('      File Size Collision!')
+        f_temp.hash()
+        f_main.hash()
+
+        assert None not in (f_temp.hashes + f_main.hashes), ('Hash '
+            'Calculations Failed!')
+
+        # If File with Same Size Exists, Check Hash
+        if f_temp.hashes == f_main.hashes:
+            print('      File Hash Collision!')
+            os.remove(temp_file)
+            print('      File Merged!')
+            return True
+
+    return False
+
+
 # Copy File and Merge
 def merge_file(rel_path, file, main_folder):
     print('    Merging File {0}/{1}...'.format(rel_path, file))
@@ -82,21 +103,8 @@ def merge_file(rel_path, file, main_folder):
         f_temp = filedata.FileData(temp_file)
         f_main = filedata.FileData(main_file)
 
-        # If File with Same Name Exists, Check Size
-        if f_temp.size == f_main.size:
-            print('      File Size Collision!')
-            f_temp.hash()
-            f_main.hash()
-
-            assert None not in (f_temp.hashes + f_main.hashes), ('Hash '
-                'Calculations Failed!')
-
-            # If File with Same Size Exists, Check Hash
-            if f_temp.hashes == f_main.hashes:
-                print('      File Hash Collision!')
-                os.remove(temp_file)
-                print('      File Merged!')
-                return
+        if check_collision(f_temp, f_main, temp_file):
+            return
 
         # If Same File Name with Different Sizes/Hashes
         # Rename New Files with Appendices
@@ -111,6 +119,8 @@ def merge_file(rel_path, file, main_folder):
                 old_file[-1]
             )
             if os.path.exists(f):
+                if check_collision(f_temp, filedata.FileData(f), temp_file):
+                    return
                 num += 1
             else:
                 os.rename(temp_file, f)

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import re
 import json
 import getpass
@@ -112,13 +113,26 @@ def get_dl(id_cour):
 
 
 def get_ov(id_cour):
-    ov_btn = defconst.session.get(defconst.url['ov_btn'].format(id_cour))
-    ov_id = re.search(
-        'd2l-button\"\sid=\"[\w_]+\"\sdata-location',
-        json.loads(ov_btn.content[9:])['Payload']['Html']
-    ).group(1)
-    print(ov_id)
-    pass
+    url_ov = defconst.url['ov'].format(id_cour)
+    ov = defconst.session.get(url_ov)
+    if b'Internal Error' in ov.content:
+        print('    No Overview!')
+        return {
+            'url' : '',
+            'name': ''
+        }
+    else:
+        ov_btn = defconst.session.get(defconst.url['ov_btn'].format(id_cour))
+        ov_id = re.search(
+            'data-title=\"([\w\_\.]+)\"',
+            json.loads(ov_btn.content[9:])['Payload']['Html']
+        ).group(1)
+
+        print('    Overview URL Got!')
+        return {
+            'url' : url_ov,
+            'name': ov_id
+        }
 
 
 # Get Info for Each Course
@@ -145,14 +159,12 @@ def get_info_courses(infopage_courses, auth):
             'name': name_cour,
             'no'  : id_cour,
             'dl'  : dl,
-            'info': None
+            'info': ov
         }
 
         print('  Course Info for {} Got!'.format(name_cour))
 
-        # break   # DEBUG
-
-    print(infodict_courses) # DEBUG
+    return defconst.cipher.encrypt(json.dumps(infodict_courses))
 
 
 # Yeah Yeah Setup
@@ -161,20 +173,30 @@ def setup():
     defconst.data['hash'] = pwd.create_pw().decode('utf-8')
     prompt_login()
 
-    # try:
-    login = fetch_config.fetch_config(False)
-    defconst.data['login'] = defconst.login
+    try:
+        login = fetch_config.fetch_config(False)
+        defconst.data['login'] = defconst.login
 
-    print()
+        print()
 
-    auth = js_auth(get_oauth_token(login.content))
+        auth = js_auth(get_oauth_token(login.content))
 
-    infopage_courses = get_courses_list(
-        get_url_enroll(login.content),
-        auth
-    )
+        infopage_courses = get_courses_list(
+            get_url_enroll(login.content),
+            auth
+        )
 
-    get_info_courses(infopage_courses, auth)
+        defconst.data['courses'] = get_info_courses(
+            infopage_courses, auth
+        ).decode('utf-8')
 
-    # except:
-    #     print('Error! Make Sure Your Credentials are Correct!')
+    except:
+        print('Error! Make Sure Your Credentials are Correct!')
+
+    else:
+        if os.path.isfile('data/data.json'):
+            if os.path.isfile('data/data.json.bak'):
+                os.remove('data/data.json.bak')
+            os.rename('data/data.json', 'data/data.json.bak')
+        with open('data/data.json', 'w') as f:
+            f.write(json.dumps(defconst.data, indent=4))

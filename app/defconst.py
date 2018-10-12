@@ -26,7 +26,7 @@ url = {
     'ov_btn'     : ('https://bbcsulb.desire2learn.com/d2l/le/content/{}/PartialMainView'
                     '?identifier=Overview&moduleTitle=Overview'
                     '&_d2l_prc%24headingLevel=2&_d2l_prc%24scope='
-                    '&_d2l_prc%24hasActiveForm=false&isXhr=true&requestId=2')
+                    '&_d2l_prc%24hasActiveForm=false&isXhr=true&requestId=2'),
     'ov'         :  'https://bbcsulb.desire2learn.com/d2l/le/content/{}/courseInfo/DownloadHomepage'
 }
 
