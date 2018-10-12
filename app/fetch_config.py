@@ -42,7 +42,7 @@ def clear_login():
 
 # LiveAgent Cookies
 def la_cookie():
-    csulb = defconst.session.get(url=defconst.url['csulb_html'])
+    csulb = defconst.session.get(defconst.url['csulb_html'])
     la_id = re.search(
         b'showWhenOnline\(\'(\w{15})\',',
         csulb.content
@@ -70,8 +70,9 @@ def la_cookie():
 
 
 # Fetch the Cookies and Configs
-def fetch_config():
-    read_personal_data('data/data.json')
+def fetch_config(read=True):
+    if read:
+        read_personal_data('data/data.json')
 
     defconst.session = requests.Session()
     print('Session Started!')

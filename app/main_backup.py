@@ -13,77 +13,77 @@ from requests import Session
 
 
 def setup():
-    COURSES_LIST_PARA = ('?search=&pageSize=20&embedDepth=1'
-                         '&sort=-PinDate,OrgUnitName,OrgUnitId'
-                         '&parentOrganizations=&orgUnitTypeId=3'
-                         '&promotePins=false&autoPinCourses=true&roles='
-                         '&excludeEnded=false')
-    COURSES_INFO_PARA = '?embedDepth=1'
+    # COURSES_LIST_PARA = ('?search=&pageSize=20&embedDepth=1'
+    #                      '&sort=-PinDate,OrgUnitName,OrgUnitId'
+    #                      '&parentOrganizations=&orgUnitTypeId=3'
+    #                      '&promotePins=false&autoPinCourses=true&roles='
+    #                      '&excludeEnded=false')
+    # COURSES_INFO_PARA = '?embedDepth=1'
 
     # Get Oauth Token
-    token = session.post(
-        url = urls['token'],
-        data = data['data']['token'],
-        headers = {
-            'x-csrf-token': re.search(
-                b'\(\'XSRF.Token\',\'(\w{32})\'\);',
-                login.content
-                ).group(1)
-            }
-        )
-    tk = json.loads(token.content)['access_token']
-    print('OAuth Token Got!')
+    # token = session.post(
+    #     url = urls['token'],
+    #     data = data['data']['token'],
+    #     headers = {
+    #         'x-csrf-token': re.search(
+    #             b'\(\'XSRF.Token\',\'(\w{32})\'\);',
+    #             login.content
+    #             ).group(1)
+    #         }
+    #     )
+    # tk = json.loads(token.content)['access_token']
+    # print('OAuth Token Got!')
 
     # Get Authorization
-    auth_js = session.get(url=urls['authjs'])
-    auth = re.search(
-        b'Authorization:\"(.*)\"\+n',
-        auth_js.content
-        ).group(1)
-
-    auth = auth.decode('utf-8') + tk
-    print('Authorization Got!')
+    # auth_js = session.get(url=urls['authjs'])
+    # auth = re.search(
+    #     b'Authorization:\"(.*)\"\+n',
+    #     auth_js.content
+    #     ).group(1)
+    #
+    # auth = auth.decode('utf-8') + tk
+    # print('Authorization Got!')
 
     # Get Enrollments URL
-    enroll_url = re.search(
-        b'enrollments-url=\"([\w\-\.:/]*)\"',
-        login.content
-        ).group(1)
-    print('Enrollments URL Got!')
+    # enroll_url = re.search(
+    #     b'enrollments-url=\"([\w\-\.:/]*)\"',
+    #     login.content
+    #     ).group(1)
+    # print('Enrollments URL Got!')
 
     # Get Courses List
-    courses_info = session.get(
-        url = enroll_url,
-        headers = {'authorization': auth}
-        )
-    courses_url = json.loads(courses_info.content)['actions'][0]['href']
-    courses_list = session.get(
-        url = courses_url + COURSES_LIST_PARA,
-        headers = {'authorization': auth}
-        )
-    courses_infopage = [
-        [
-            c['links'][1]['href'].split('/')[-1],
-            c['links'][1]['href'] + COURSES_INFO_PARA
-            ]
-        for c in json.loads(courses_list.content)['entities']
-        if c['class'][1] == 'pinned'
-        ]
-    print('Courses List Got!')
+    # courses_info = session.get(
+    #     url = enroll_url,
+    #     headers = {'authorization': auth}
+    #     )
+    # courses_url = json.loads(courses_info.content)['actions'][0]['href']
+    # courses_list = session.get(
+    #     url = courses_url + COURSES_LIST_PARA,
+    #     headers = {'authorization': auth}
+    #     )
+    # courses_infopage = [
+    #     [
+    #         c['links'][1]['href'].split('/')[-1],
+    #         c['links'][1]['href'] + COURSES_INFO_PARA
+    #         ]
+    #     for c in json.loads(courses_list.content)['entities']
+    #     if c['class'][1] == 'pinned'
+    #     ]
+    # print('Courses List Got!')
 
     # Get Info for Each Course
-    courses_infodict = {}
-    for cour_id, cour_url in courses_infopage:
-        cour_info = session.get(
-            url = cour_url,
-            headers = {'authorization': auth}
-        )
-        cour_name = json.loads(cour_info.content)['properties']['name']
-        courses_infodict[cour_id] = {
-            'name': cour_name,
-            'no': cour_id
-        }
-        print('Courses Info for {} Got!'.format(cour_name))
+    # courses_infodict = {}
+    # for cour_id, cour_url in courses_infopage:
+        # cour_info = session.get(
+        #     url = cour_url,
+        #     headers = {'authorization': auth}
+        # )
+        # cour_name = json.loads(cour_info.content)['properties']['name']
+        # courses_infodict[cour_id] = {
+        #     'name': cour_name,
+        #     'no': cour_id
+        # }
+        # print('Courses Info for {} Got!'.format(cour_name))
 
         course_content = session.get(url=urls['content'].format(cour_id))
         print('\n{}\n'.format(course_content.content))
@@ -91,7 +91,7 @@ def setup():
     # print('\n\n{}\n\n'.format(courses_infodict))
 
 
-def setup_and_fetch(setup):
+# def setup_and_fetch(setup):
     # with open('./data/data.json', 'r') as json_data:
     #     data = json.loads(json_data.read())
     # print('Configurations Successfully Read!')
@@ -114,8 +114,8 @@ def setup_and_fetch(setup):
     #     )
     # print('Successfully Logged In!')
 
-    if setup:   # TODO: setup
-        setup()
+    # if setup:   # TODO: setup
+    #     setup()
 
     # CSULB Page
     # csulb = session.get(url=urls['csulb'])
@@ -251,17 +251,17 @@ def setup_and_fetch(setup):
                 #     os.rename(temp_file, main_file)
                 #     print('      File Copied!')
 
-    print()
+    # print()
 
     # Get Rid of Empty Folders, Lazy Method
-    for _ in range(2):
-        for dirpath, directories, files in os.walk('Contents', topdown=False):
-            if not directories and not files:
-                os.rmdir(dirpath)
-    print('Empty Folders Cleared!')
+    # for _ in range(2):
+    #     for dirpath, directories, files in os.walk('Contents', topdown=False):
+    #         if not directories and not files:
+    #             os.rmdir(dirpath)
+    # print('Empty Folders Cleared!')
 
 
-def main():
+# def main():
     # HELP = '''
     # This project is distributed under GPLv3 by Mushinako. This project comes
     # with absolutely NO warranty, and I am NOT responsible for any data loss

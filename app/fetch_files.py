@@ -29,7 +29,7 @@ def dl_content(temp_course, name):
     else:
         print('  Downloading Contents...')
 
-        dl = defconst.session.get(url=dl_url)
+        dl = defconst.session.get(dl_url)
         zip_name = '{0}/{1}.zip'.format(temp_course, name)
 
         with open(zip_name, 'wb') as f:
@@ -43,6 +43,7 @@ def dl_content(temp_course, name):
                 z.extractall(temp_course)
         except zipfile.BadZipFile:
             print('    Content for {} is not a ZipFile!'.format(name))
+            print('      Try Refreshing URLs with -f')
         else:
             print('  Contents Extracted!')
         finally:
@@ -95,7 +96,7 @@ def merge_file(rel_path, file, main_folder):
                 print('      File Hash Collision!')
                 os.remove(temp_file)
                 print('      File Merged!')
-                continue
+                return
 
         # If Same File Name with Different Sizes/Hashes
         # Rename New Files with Appendices
@@ -152,7 +153,9 @@ def rmdir_empty():
     for _ in range(2):
         for dir_path, dirs, files in os.walk('Contents', topdown=False):
             if not directories and not files:
-                pass
+                os.rmdir(dir_path)
+
+    print('Empty Folders Cleared!')
 
 
 # Fetch Files
@@ -178,5 +181,3 @@ def fetch_files():
     print()
 
     rmdir_empty()
-
-    pass

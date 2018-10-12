@@ -50,14 +50,18 @@ def main(): # TODO: Other implementations
                 if os.path.isdir('Temp'):
                     shutil.rmtree('Temp')
                 print()
+
         else:
             print('Configuration Data not Found')
             print('Setting up...')
             conf_setup.setup()
+
     elif sys.argv[1] in ['-h', '--help']:
         print(HELP)
+
     elif sys.argv[1] in ['-r', '--reset']:
         conf_setup.setup()
+
     else:
         raise ValueError('Invalid arguments! Use \'-h\' for help!')
 

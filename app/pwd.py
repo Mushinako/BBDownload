@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
+import os
 import sys
 import base64
 import hashlib
 import bcrypt
-from getpass import getpass
+import getpass
 from Crypto import Random
 from Crypto.Cipher import AES
-
 
 import defconst
 
@@ -34,16 +34,17 @@ class AESCipher:
         return data[:-data[-1]]
 
 
+# Check if Password is Correct
 def check_pw(pw_hash):
-    pw = getpass().encode('utf-8')
+    pw = getpass.getpass('Decrypt Your Credentials: ').encode('utf-8')
     hashed = pw_hash.encode('utf-8')
     print()
 
     if hashed == bcrypt.hashpw(pw, hashed):
         return pw
     else:
-        print('Password no match!')
-        print('Make sure you use the password set up in this app!')
+        print('Password No Match!')
+        print('Make Sure You Use the Password Set Up in This App!')
         sys.exit()
 
 
@@ -51,3 +52,28 @@ def check_pw(pw_hash):
 def create_cipher():
     if defconst.cipher is None:
         defconst.cipher = AESCipher(check_pw(defconst.data['hash']))
+
+
+# Create Password
+def create_pw():
+    while True:
+        os.system('cls' if os.name == 'nt' else 'clear')
+
+        pw1 = getpass.getpass((
+            'Inputed Password won\'t Show for Security Reasons.'
+            'Keep Typing and Hit Enter When You Finish.\n'
+            'Think of a Password to Encrypt Your Login Crendentials: '
+        )).encode('utf-8')
+        hashed = bcrypt.hashpw(pw1, bcrypt.gensalt())
+
+        pw2 = getpass.getpass(
+            'Now Think of That Password Again: '
+        ).encode('utf-8')
+
+        # If Passwords Match, Yay!
+        if hashed == bcrypt.hashpw(pw2, hashed):
+            print('Password Set up!\n')
+            defconst.cipher = AESCipher(pw2)
+            return hashed
+        else:
+            print('Password No Match!\n')
