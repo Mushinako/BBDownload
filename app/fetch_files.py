@@ -6,6 +6,7 @@ import zipfile
 
 import pwd
 import defconst
+import filedata
 
 
 # Decrypt Courses Data
@@ -64,8 +65,60 @@ def dl_overview(temp_course):
         print('  Overview Downloaded!')
 
 
-def merge_file(rel_path, file):
-    print('    Merging File {0}/{1}...'.format())
+# Copy File and Merge
+def merge_file(rel_path, file, main_folder):
+    print('    Merging File {0}/{1}...'.format(rel_path, file))
+    temp_file = '{0}/{1}'.format(temp_folder, file)
+    main_file = re.sub(
+        '\s\(\d+\).',
+        '.',
+        '{0}/{1}'.format(main_folder, file)
+    ).strip()
+
+    # Check if File with Same Name Exists
+    if os.path.isfile(main_file):
+        print('      File Name Collision!')
+        f_temp = filedata.FileData(temp_file)
+        f_main = filedata.FileData(main_file)
+
+        # If File with Same Name Exists, Check Size
+        if f_temp.size == f_main.size:
+            print('      File Size Collision!')
+            f_temp.hash()
+            f_main.hash()
+
+            assert None not in (f_temp.hashes + f_main.hashes), ('Hash '
+                'Calculations Failed!')
+
+            # If File with Same Size Exists, Check Hash
+            if f_temp.hashes == f_main.hashes:
+                print('      File Hash Collision!')
+                os.remove(temp_file)
+                print('      File Merged!')
+                continue
+
+        # If Same File Name with Different Sizes/Hashes
+        # Rename New Files with Appendices
+        old_file = main_file.split('.')
+        num = 1
+
+        # Try Finding First Unused Number
+        while True:
+            f = '{0} {1}.{2}'.format(
+                '.'.join(old_file[:-1]),
+                num,
+                old_file[-1]
+            )
+            if os.path.exists(f):
+                num += 1
+            else:
+                os.rename(temp_file, f)
+                print('      File Renamed as {}!'.format(f))
+
+    # Directly Move the File If No File with the Sams Name Exists
+    else:
+        os.rename(temp_file, main_file)
+        print('      File Copied!')
 
 
 # Merge Temp to Contents
@@ -91,7 +144,15 @@ def merge_to_main(temp_course, name):
         pathlib.Path(main_folder).mkdir(parents=True, exist_ok=True)
 
         for file in files:
-            merge_file(rel_path, file)
+            merge_file(rel_path, file, main_folder)
+
+
+# Get Rid of Empty Folders, Lazy Method
+def rmdir_empty():
+    for _ in range(2):
+        for dir_path, dirs, files in os.walk('Contents', topdown=False):
+            if not directories and not files:
+                pass
 
 
 # Fetch Files
@@ -113,4 +174,9 @@ def fetch_files():
         print()
 
         merge_to_main(temp_course, name)
+
+    print()
+
+    rmdir_empty()
+
     pass

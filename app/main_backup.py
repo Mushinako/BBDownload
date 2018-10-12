@@ -202,54 +202,54 @@ def setup_and_fetch(setup):
         #     Path(main_folder).mkdir(parents=True, exist_ok=True)
 
             # Copy to Main Folder
-            for file in files:
-                print('    Merging File {0}\\{1}...'.format(rel_path, file))
-                temp_file = '{0}\\{1}'.format(temp_folder, file)
-                main_file = re.sub(' \(\d+\).', '.', '{0}\\{1}'.format(main_folder, file))
-                while main_file[0] == ' ':
-                    main_file = main_file[1:]
+            # for file in files:
+            #     print('    Merging File {0}\\{1}...'.format(rel_path, file))
+            #     temp_file = '{0}\\{1}'.format(temp_folder, file)
+            #     main_file = re.sub(' \(\d+\).', '.', '{0}\\{1}'.format(main_folder, file))
+            #     while main_file[0] == ' ':
+            #         main_file = main_file[1:]
 
                 # Check If File With Same Name Exists
-                if os.path.isfile(main_file):
-                    print('      File Name Collision!')
-                    f_temp = FileData(temp_file)
-                    f_main = FileData(main_file)
+                # if os.path.isfile(main_file):
+                #     print('      File Name Collision!')
+                #     f_temp = FileData(temp_file)
+                #     f_main = FileData(main_file)
 
                     # If File with Same Name Exists, Check Size
-                    if f_temp.size == f_main.size:
-                        print('      File Size Collision!')
-                        f_temp.hash()
-                        f_main.hash()
+                    # if f_temp.size == f_main.size:
+                    #     print('      File Size Collision!')
+                    #     f_temp.hash()
+                    #     f_main.hash()
 
                         # If File with Same Size Exists, Check Hash
-                        assert None not in f_temp.hashes + f_main.hashes, 'Hash Calculations Failed!'
-                        if f_temp.md5 == f_main.md5 and f_temp.sha1 == f_main.sha1:
-                            print('      File Hash Collision!')
-                            os.remove(temp_file)
-                            print('      File Merged!')
-                            continue
+                        # assert None not in f_temp.hashes + f_main.hashes, 'Hash Calculations Failed!'
+                        # if f_temp.md5 == f_main.md5 and f_temp.sha1 == f_main.sha1:
+                        #     print('      File Hash Collision!')
+                        #     os.remove(temp_file)
+                        #     print('      File Merged!')
+                        #     continue
 
                     # If Same File Name with Different Sizes/Hashes, Rename New File with Appendixes
-                    old_file = main_file.split('.')
-                    num = 1
+                    # old_file = main_file.split('.')
+                    # num = 1
 
                     # Try unused numbers
-                    while True:
-                        f = '{0} {1}.{2}'.format(
-                            '.'.join(old_file[:-1]),
-                            num,
-                            old_file[-1]
-                            )
-                        if os.path.exists(f):
-                            num += 1
-                        else:
-                            os.rename(temp_file, f)
-                            print('      File Renamed as {}!'.format(f))
+                    # while True:
+                    #     f = '{0} {1}.{2}'.format(
+                    #         '.'.join(old_file[:-1]),
+                    #         num,
+                    #         old_file[-1]
+                    #         )
+                    #     if os.path.exists(f):
+                    #         num += 1
+                    #     else:
+                    #         os.rename(temp_file, f)
+                    #         print('      File Renamed as {}!'.format(f))
 
                 # Directly Move the File If No File with the Same Name Exists
-                else:
-                    os.rename(temp_file, main_file)
-                    print('      File Copied!')
+                # else:
+                #     os.rename(temp_file, main_file)
+                #     print('      File Copied!')
 
     print()
 

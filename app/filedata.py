@@ -8,8 +8,6 @@ class FileData:
     def __init__(self, path):
         self.path = path
         self.size = os.stat(path).st_size
-        self.md5 = None
-        self.sha1 = None
         self.hashes = None
 
     def hash(self):
@@ -22,6 +20,4 @@ class FileData:
                     break
                 m.update(data)
                 s.update(data)
-        self.md5 = m.hexdigest()
-        self.sha1 = s.hexdigest()
-        self.hashes = [self.md5, self.sha1]
+        self.hashes = [m.hexdigest(), s.hexdigest()]
