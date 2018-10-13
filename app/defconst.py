@@ -58,4 +58,5 @@ oauth_token = {
 
 session = None
 data = None
+lg = None
 cipher = None

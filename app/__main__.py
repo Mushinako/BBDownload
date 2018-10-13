@@ -19,9 +19,9 @@ def main(): # TODO: Other implementations
     This short script grabs all files from BeachBoard @ CSULB (hopefully),
     unless the system breaks (which occurs often) or have some major changes.
 
-    [This program needs to be setup at the first time, asking you for your
-    credentials, and a file named "data.json" should appear, storing
-    necessary data. This file will refresh once every 5 times the program is
+    This program needs to be setup at the first time, asking you for your
+    credentials, and a file named "data.json" should appear in data/, storing
+    necessary data. [This file will refresh once every 5 times the program is
     run. (FUTURE)]
 
     You also need a password, ideally different from your CSULB password, to
@@ -41,13 +41,22 @@ def main(): # TODO: Other implementations
                     passphrase for this app.
     '''
 
+    os.system('cls' if os.name == 'nt' else 'clear')
+
     if len(sys.argv) == 1:
         if os.path.isfile('data/data.json'):
+            if os.path.isdir('Temp'):
+                shutil.rmtree('Temp')
+
             try:
-                fetch_config.fetch_config()
+                fetch_config.fetch_config(True)
                 fetch_files.fetch_files()
-            except:
-                print('Error!')
+
+            except Exception as e:
+                print(e)
+                if os.path.isdir('Contents'):
+                    shutil.rmtree('Contents')
+
             finally:
                 if os.path.isdir('Temp'):
                     shutil.rmtree('Temp')
@@ -56,13 +65,16 @@ def main(): # TODO: Other implementations
         else:
             print('Configuration Data not Found')
             print('Setting up...')
-            conf_setup.setup()
+            conf_setup.setup(False)
 
     elif sys.argv[1] in ['-h', '--help']:
         print(HELP)
 
+    elif sys.argv[1] in ['-c', '--course']:
+        conf_setup.setup(os.path.isfile('data/data.json'))
+
     elif sys.argv[1] in ['-r', '--reset']:
-        conf_setup.setup()
+        conf_setup.setup(False)
 
     else:
         raise ValueError('Invalid arguments! Use \'-h\' for help!')

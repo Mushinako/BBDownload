@@ -167,15 +167,29 @@ def get_info_courses(infopage_courses, auth):
     return defconst.cipher.encrypt(json.dumps(infodict_courses))
 
 
+def write_json():
+    if os.path.isfile('data/data.json'):
+        if os.path.isfile('data/data.bak.json'):
+            os.remove('data/data.bak.json')
+        os.rename('data/data.json', 'data/data.bak.json')
+    with open('data/data.json', 'w') as f:
+        f.write(json.dumps(defconst.data, indent=4))
+
+
 # Yeah Yeah Setup
-def setup():
-    defconst.data = {}
-    defconst.data['hash'] = pwd.create_pw().decode('utf-8')
-    prompt_login()
+def setup(refresh):
+    if not refresh:
+        defconst.data = {}
+        defconst.data['hash'] = pwd.create_pw().decode('utf-8')
+        prompt_login()
 
     try:
-        login = fetch_config.fetch_config(False)
-        defconst.data['login'] = defconst.login
+        if refresh:
+            login = fetch_config.fetch_config(True)
+
+        else:
+            login = fetch_config.fetch_config(False)
+            defconst.data['login'] = defconst.login
 
         print()
 
@@ -190,13 +204,9 @@ def setup():
             infopage_courses, auth
         ).decode('utf-8')
 
-    except:
+    except Exception as e:
+        print(e)
         print('Error! Make Sure Your Credentials are Correct!')
 
     else:
-        if os.path.isfile('data/data.json'):
-            if os.path.isfile('data/data.json.bak'):
-                os.remove('data/data.json.bak')
-            os.rename('data/data.json', 'data/data.json.bak')
-        with open('data/data.json', 'w') as f:
-            f.write(json.dumps(defconst.data, indent=4))
+        write_json()

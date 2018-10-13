@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import re
 import json
 import pathlib
 import zipfile
@@ -11,19 +12,18 @@ import filedata
 
 # Decrypt Courses Data
 def decrypt_courses():
-    return json.loads(pwd.create_cipher().decrypt(defconst.data['courses']))
+    return json.loads(defconst.cipher.decrypt(defconst.data['courses']))
 
 
 # Create Folders as Necessary
 def create_dir(name):
     temp_course = 'Temp/{}'.format(name)
-    pathlib.Path(temp_course).mkdir(parents=True)
+    pathlib.Path(temp_course).mkdir(parents=True, exist_ok=True)
     return temp_course
 
 
 # Content Download
-def dl_content(temp_course, name):
-    dl_url = prop['dl']
+def dl_content(temp_course, name, dl_url):
     if dl_url == '':
         print('  No Contents!')
     else:
@@ -51,16 +51,15 @@ def dl_content(temp_course, name):
 
 
 # Overview Download
-def dl_overview(temp_course):
-    ov_url = prop['info']
-    if ov_url == '':
+def dl_overview(temp_course, ov_url):
+    if ov_url['url'] == '':
         print('  No Overview!')
     else:
         print('  Downloading Overview...')
 
-        ov = session.get(url=ov_url)
+        ov = defconst.session.get(url=ov_url['url'])
 
-        with open('{}/Overview.pdf'.format(temp_course), 'wb') as f:
+        with open('{}/{}'.format(temp_course, ov_url['name']), 'wb') as f:
             f.write(ov.content)
 
         print('  Overview Downloaded!')
@@ -88,7 +87,7 @@ def check_collision(f_temp, f_main, temp_file):
 
 
 # Copy File and Merge
-def merge_file(rel_path, file, main_folder):
+def merge_file(rel_path, file, temp_folder, main_folder):
     print('    Merging File {0}/{1}...'.format(rel_path, file))
     temp_file = '{0}/{1}'.format(temp_folder, file)
     main_file = re.sub(
@@ -145,7 +144,7 @@ def merge_to_main(temp_course, name):
         rel_path = '/'.join(temp_folder.split('/')[1:])
 
         print('  Merging Folder {}...'.format(rel_path))
-        print('  Files Present: {}'.format(files))
+        # print('  Files Present: {}'.format(files))    # Disabled. Too Long
 
         main_folder = '{0}/{1}'.format(
             main_course,
@@ -155,14 +154,14 @@ def merge_to_main(temp_course, name):
         pathlib.Path(main_folder).mkdir(parents=True, exist_ok=True)
 
         for file in files:
-            merge_file(rel_path, file, main_folder)
+            merge_file(rel_path, file, temp_folder, main_folder)
 
 
 # Get Rid of Empty Folders, Lazy Method
 def rmdir_empty():
     for _ in range(2):
         for dir_path, dirs, files in os.walk('Contents', topdown=False):
-            if not directories and not files:
+            if not dirs and not files:
                 os.rmdir(dir_path)
 
     print('Empty Folders Cleared!')
@@ -181,8 +180,8 @@ def fetch_files():
 
         temp_course = create_dir(name)
 
-        dl_content(temp_course, name)
-        dl_overview(temp_course)
+        dl_content(temp_course, name, prop['dl'])
+        dl_overview(temp_course, prop['info'])
 
         print()
 

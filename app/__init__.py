@@ -1,2 +1,2 @@
 author = 'Mushinako'
-version = '0.6.3'
+version = '1.0.0-beta-20181012'

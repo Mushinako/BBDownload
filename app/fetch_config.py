@@ -19,9 +19,9 @@ def read_personal_data(json_file):
 def decrypt_login():
     pwd.create_cipher()
 
-    data_login = defconst.data['login']
-    data_login['userName'] = defconst.cipher.decrypt(data_login['userName'])
-    data_login['password'] = defconst.cipher.decrypt(data_login['password'])
+    defconst.lg = json.loads(json.dumps(defconst.data['login']))
+    defconst.lg['userName'] = defconst.cipher.decrypt(defconst.lg['userName'])
+    defconst.lg['password'] = defconst.cipher.decrypt(defconst.lg['password'])
 
     print('Configurations Successfully Decrypted!')
 
@@ -31,13 +31,13 @@ def bb_login():
     print('Successfully Logged In!')
     return defconst.session.post(
         url  = defconst.url['login'],
-        data = defconst.data['login']
+        data = defconst.lg
     )
 
 
 # Clear Login-Related Information
 def clear_login():
-    defconst.data['login'] = {}
+    defconst.lg = None
 
 
 # LiveAgent Cookies
@@ -70,7 +70,7 @@ def la_cookie():
 
 
 # Fetch the Cookies and Configs
-def fetch_config(read=True):
+def fetch_config(read):
     if read:
         read_personal_data('data/data.json')
 
