@@ -1,4 +1,4 @@
-#   bbdownload – BeachBoard Content Downloader
+#   BBDownload – BeachBoard Content Downloader
 This short script grabs all files from BeachBoard @ CSULB (hopefully),
 unless the system breaks (which occurs often) or have some major changes.
 
@@ -46,7 +46,7 @@ name (possibly different versions) will be renamed by attaching " (1)",
 ```
 
 ##  Requirement
-* Python 3.6+
+* Python 3.6+ (May work on 3.5 but I cannot guarantee)
 * [pyCryptodome](https://www.pycryptodome.org/en/latest/index.html)
     * Install with `pip install pycryptodome` or `pip3 install pycryptodome`
 * Necessary Credentials to Log into BeachBoard
