@@ -45,11 +45,12 @@ name (possibly different versions) will be renamed by attaching " (1)",
 ```
 
 ##  Requirement
-* Python 3.6+ (May work on 3.5 but I cannot guarantee)
+* Python 3.6+ (May work on 3.5 but I Cannot Guarantee)
 * [pyCryptodome](https://www.pycryptodome.org/en/latest/index.html)
     * Install with `pip install pycryptodome` or `pip3 install pycryptodome`
-* Necessary Credentials to Log into BeachBoard
-* Other BB Configurations (Pin Your Courses!)
+* Necessary Credentials to Log into BeachBoard and Proper Settings
+  * **Pin Your Courses!**
+* Obviously, Internet Connection
 * Disk Space
 * Enough Sanity to Bear the Bugs
 
