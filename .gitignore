@@ -1,4 +1,4 @@
 Contents/
 Temp/
 app/__pycache__/
-data/tmp*
+data/
