@@ -168,10 +168,16 @@ def get_info_courses(infopage_courses, auth):
 
 
 def write_json():
+    if not os.path.isdir('data'):
+        if os.path.isfile('data'):
+            os.rename('data', 'data.bak')
+        os.mkdir('data')
+
     if os.path.isfile('data/data.json'):
         if os.path.isfile('data/data.bak.json'):
             os.remove('data/data.bak.json')
         os.rename('data/data.json', 'data/data.bak.json')
+
     with open('data/data.json', 'w') as f:
         f.write(json.dumps(defconst.data, indent=4))
 
