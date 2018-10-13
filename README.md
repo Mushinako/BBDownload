@@ -23,9 +23,8 @@ Alternative:
 **Please pin your courses that you would like to be downloaded.**
 
 This program needs to be setup at the first time, asking you for your
-credentials, and a file named "data.json" should appear in data/, storing
-necessary data. ~~This file will refresh once every 5 times the program is
-run. (FUTURE)~~
+credentials, and a file named "data.json" should appear in "data" folder,
+storing necessary data for log-in and courses.
 
 You also need a password, ideally different from your CSULB password, to
 encrypt the latter in the file. You will need this password EVERY time you
@@ -53,6 +52,10 @@ name (possibly different versions) will be renamed by attaching " (1)",
 * Other BB Configurations (Pin Your Courses!)
 * Disk Space
 * Enough Sanity to Bear the Bugs
+
+##  Future
+* Download Grades Maybe?
+* Auto-Refresh After Failure
 
 ##  Contributions!
 Absolutely! File an issue and/or start a pull request! This project is likely
