@@ -57,8 +57,6 @@ def create_cipher():
 # Create Password
 def create_pw():
     while True:
-        os.system('cls' if os.name == 'nt' else 'clear')
-
         pw1 = getpass.getpass((
             'Inputed Password won\'t Show for Security Reasons.'
             'Keep Typing and Hit Enter When You Finish.\n'
@@ -75,5 +73,5 @@ def create_pw():
             print('Password Set up!\n')
             defconst.cipher = AESCipher(pw2)
             return hashed
-        else:
-            print('Password No Match!\n')
+        print('Password No Match!\n')
+        os.system('cls' if os.name == 'nt' else 'clear')

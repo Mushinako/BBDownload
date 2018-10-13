@@ -121,18 +121,18 @@ def get_ov(id_cour):
             'url' : '',
             'name': ''
         }
-    else:
-        ov_btn = defconst.session.get(defconst.url['ov_btn'].format(id_cour))
-        ov_id = re.search(
-            'data-title=\"([\w\_\.]+)\"',
-            json.loads(ov_btn.content[9:])['Payload']['Html']
-        ).group(1)
 
-        print('    Overview URL Got!')
-        return {
-            'url' : url_ov,
-            'name': ov_id
-        }
+    ov_btn = defconst.session.get(defconst.url['ov_btn'].format(id_cour))
+    ov_id = re.search(
+        'data-title=\"([\w\_\.]+)\"',
+        json.loads(ov_btn.content[9:])['Payload']['Html']
+    ).group(1)
+
+    print('    Overview URL Got!')
+    return {
+        'url' : url_ov,
+        'name': ov_id
+    }
 
 
 # Get Info for Each Course
@@ -216,3 +216,4 @@ def setup(refresh):
 
     else:
         write_json()
+        print()

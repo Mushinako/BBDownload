@@ -26,43 +26,45 @@ def create_dir(name):
 def dl_content(temp_course, name, dl_url):
     if dl_url == '':
         print('  No Contents!')
+        return
+
+    print('  Downloading Contents...')
+
+    dl = defconst.session.get(dl_url)
+    zip_name = '{0}/{1}.zip'.format(temp_course, name)
+
+    with open(zip_name, 'wb') as f:
+        f.write(dl.content)
+
+    print('  Contents Downloaded!')
+    print('  Extracting Contents...')
+
+    try:
+        with zipfile.ZipFile(zip_name, 'r') as z:
+            z.extractall(temp_course)
+    except zipfile.BadZipFile:
+        print('    Content for {} is not a ZipFile!'.format(name))
+        print('      Try Refreshing URLs with -c')
     else:
-        print('  Downloading Contents...')
-
-        dl = defconst.session.get(dl_url)
-        zip_name = '{0}/{1}.zip'.format(temp_course, name)
-
-        with open(zip_name, 'wb') as f:
-            f.write(dl.content)
-
-        print('  Contents Downloaded!')
-        print('  Extracting Contents...')
-
-        try:
-            with zipfile.ZipFile(zip_name, 'r') as z:
-                z.extractall(temp_course)
-        except zipfile.BadZipFile:
-            print('    Content for {} is not a ZipFile!'.format(name))
-            print('      Try Refreshing URLs with -c')
-        else:
-            print('  Contents Extracted!')
-        finally:
-            os.remove(zip_name)
+        print('  Contents Extracted!')
+    finally:
+        os.remove(zip_name)
 
 
 # Overview Download
 def dl_overview(temp_course, ov_url):
     if ov_url['url'] == '':
         print('  No Overview!')
-    else:
-        print('  Downloading Overview...')
+        return
 
-        ov = defconst.session.get(url=ov_url['url'])
+    print('  Downloading Overview...')
 
-        with open('{}/{}'.format(temp_course, ov_url['name']), 'wb') as f:
-            f.write(ov.content)
+    ov = defconst.session.get(url=ov_url['url'])
 
-        print('  Overview Downloaded!')
+    with open('{}/{}'.format(temp_course, ov_url['name']), 'wb') as f:
+        f.write(ov.content)
+
+    print('  Overview Downloaded!')
 
 
 # Check File Collision
@@ -91,7 +93,7 @@ def merge_file(rel_path, file, temp_folder, main_folder):
     print('    Merging File {0}/{1}...'.format(rel_path, file))
     temp_file = '{0}/{1}'.format(temp_folder, file)
     main_file = re.sub(
-        '\s\(\d+\).',
+        '\s+\(\d+\).',
         '.',
         '{0}/{1}'.format(main_folder, file)
     ).strip()
@@ -112,7 +114,7 @@ def merge_file(rel_path, file, temp_folder, main_folder):
 
         # Try Finding First Unused Number
         while True:
-            f = '{0} {1}.{2}'.format(
+            f = '{0} ({1}).{2}'.format(
                 '.'.join(old_file[:-1]),
                 num,
                 old_file[-1]
@@ -125,10 +127,11 @@ def merge_file(rel_path, file, temp_folder, main_folder):
                 os.rename(temp_file, f)
                 print('      File Renamed as {}!'.format(f))
 
+        return
+
     # Directly Move the File If No File with the Sams Name Exists
-    else:
-        os.rename(temp_file, main_file)
-        print('      File Copied!')
+    os.rename(temp_file, main_file)
+    print('      File Copied!')
 
 
 # Merge Temp to Contents
