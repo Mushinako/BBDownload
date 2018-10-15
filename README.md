@@ -34,7 +34,7 @@ name (possibly different versions) will be renamed by attaching " (1)",
 
 ### On Mac OS/Linux:
 - Make `app.sh` executable (`chmod +x ./app.sh`)
-- Double-click on `app.sh` or run `./app.sh [-h|-c|-r]` from terminal
+- Open a terminal in this folder and run `./app.sh [-h|-c|-r]` from terminal
 
 ### Alternative:
 - Use `python3 app [-h|-c|-r]` in this directory
