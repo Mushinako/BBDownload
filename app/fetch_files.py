@@ -96,7 +96,7 @@ def merge_file(rel_path, file, temp_folder, main_folder):
         '\s+\(\d+\).',
         '.',
         '{0}/{1}'.format(main_folder, file)
-    ).strip()
+    ).strip().replace('//', '/')
 
     # Check if File with Same Name Exists
     if os.path.isfile(main_file):
@@ -126,6 +126,7 @@ def merge_file(rel_path, file, temp_folder, main_folder):
             else:
                 os.rename(temp_file, f)
                 print('      File Renamed as {}!'.format(f))
+                return
 
         return
 
