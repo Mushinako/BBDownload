@@ -1,7 +1,6 @@
 import os
 import sys
 import shutil
-import zipfile
 
 import fetch_config
 import fetch_files
@@ -32,7 +31,7 @@ def fetch_content():
     conf_setup.setup(False)
 
 
-def main(): # TODO: Other implementations
+def main():  # TODO: Other implementations
     HELP = '''
     This project is distributed under GPLv3 by Mushinako. This project comes
       with absolutely NO warranty, and I am NOT responsible for any data loss
@@ -81,7 +80,7 @@ def main(): # TODO: Other implementations
 
     if len(sys.argv) == 1:
         fetch_content()
-        fetch_grades(1, False)
+        fetch_grades.fetch_grades(1, False)
         return
 
     elif sys.argv[1] in ['-h', '--help']:
