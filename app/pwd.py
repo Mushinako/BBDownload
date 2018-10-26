@@ -20,7 +20,7 @@ class AESCipher:
         c = AES.new(self.key, AES.MODE_CBC, iv)
         return base64.b64encode(
             iv + c.encrypt(self._pad(data).encode('utf-8'))
-        )
+            )
 
     def decrypt(self, data):
         data = base64.b64decode(data)
@@ -63,12 +63,11 @@ def create_pw():
             'Inputed Password won\'t Show for Security Reasons.'
             'Keep Typing and Hit Enter When You Finish.\n'
             'Think of a Password to Encrypt Your Login Crendentials: '
-        )).encode('utf-8')
+            )).encode('utf-8')
         hashed = bcrypt.hashpw(pw1, bcrypt.gensalt())
 
-        pw2 = getpass.getpass(
-            'Now Think of That Password Again: '
-        ).encode('utf-8')
+        pw2 = getpass.getpass('Now Think of That Password Again: '
+                              ).encode('utf-8')
 
         # If Passwords Match, Yay!
         if hashed == bcrypt.hashpw(pw2, hashed):
