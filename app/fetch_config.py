@@ -29,10 +29,8 @@ def decrypt_login():
 # Login from Main Page
 def bb_login():
     print('Successfully Logged In!')
-    return defconst.session.post(
-        url  = defconst.url['login'],
-        data = defconst.lg
-    )
+    return defconst.session.post(url  = defconst.url['login'],
+                                 data = defconst.lg)
 
 
 # Clear Login-Related Information
@@ -43,14 +41,12 @@ def clear_login():
 # LiveAgent Cookies
 def la_cookie():
     csulb = defconst.session.get(defconst.url['csulb_html'])
-    la_id = re.search(
-        b'showWhenOnline\(\'(\w{15})\',',
-        csulb.content
-    )
+    la_id = re.search(b'showWhenOnline\(\'(\w{15})\',',
+                      csulb.content)
     la_init = re.search(
         b'salesforceliveagent.com/chat\', \'(\w{15})\', \'(\w{15})\'',
         csulb.content
-    )
+        )
 
     print('LiveAgent Configurations Got!')
 
@@ -58,7 +54,7 @@ def la_cookie():
         la_id.group(1).decode('utf-8'),
         la_init.group(1).decode('utf-8'),
         la_init.group(2).decode('utf-8')
-    ))
+        ))
 
     ssid = json.loads(la.content[27:-2])['messages'][0]['message']['sessionId']
     la_ck = defconst.la_cookies

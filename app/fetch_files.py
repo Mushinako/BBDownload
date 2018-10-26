@@ -17,7 +17,7 @@ def decrypt_courses():
 
 # Create Folders as Necessary
 def create_dir(name):
-    temp_course = 'Temp/{}'.format(name)
+    temp_course = os.path.join('Temp', name)
     pathlib.Path(temp_course).mkdir(parents=True, exist_ok=True)
     return temp_course
 
@@ -31,7 +31,7 @@ def dl_content(temp_course, name, dl_url):
     print('  Downloading Contents...')
 
     dl = defconst.session.get(dl_url)
-    zip_name = '{0}/{1}.zip'.format(temp_course, name)
+    zip_name = os.path.join(temp_course, name+'.zip')
 
     with open(zip_name, 'wb') as f:
         f.write(dl.content)
@@ -61,7 +61,7 @@ def dl_overview(temp_course, ov_url):
 
     ov = defconst.session.get(url=ov_url['url'])
 
-    with open('{}/{}'.format(temp_course, ov_url['name']), 'wb') as f:
+    with open(os.path.join(temp_course, ov_url['name']), 'wb') as f:
         f.write(ov.content)
 
     print('  Overview Downloaded!')
@@ -90,13 +90,10 @@ def check_collision(f_temp, f_main, temp_file):
 
 # Copy File and Merge
 def merge_file(rel_path, file, temp_folder, main_folder):
-    print('    Merging File {0}/{1}...'.format(rel_path, file))
-    temp_file = '{0}/{1}'.format(temp_folder, file)
-    main_file = re.sub(
-        '\s+\(\d+\).',
-        '.',
-        '{0}/{1}'.format(main_folder, file)
-    ).strip().replace('//', '/')
+    print('    Merging File {}...'.format(os.path.join(rel_path, file)))
+    temp_file = os.path.join(temp_folder, file)
+    main_file = re.sub('\s+\(\d+\).', '.', os.path.join(main_folder, file)
+                       ).strip().replace('//', '/')
 
     # Check if File with Same Name Exists
     if os.path.isfile(main_file):
@@ -114,11 +111,8 @@ def merge_file(rel_path, file, temp_folder, main_folder):
 
         # Try Finding First Unused Number
         while True:
-            f = '{0} ({1}).{2}'.format(
-                '.'.join(old_file[:-1]),
-                num,
-                old_file[-1]
-            )
+            f = '{0} ({1}).{2}'.format('.'.join(old_file[:-1]), num,
+                                       old_file[-1])
             if os.path.exists(f):
                 if check_collision(f_temp, filedata.FileData(f), temp_file):
                     return
@@ -139,7 +133,7 @@ def merge_file(rel_path, file, temp_folder, main_folder):
 def merge_to_main(temp_course, name):
     print('Merging {} to Main Folder...'.format(name))
 
-    main_course = 'Contents/{}'.format(name)
+    main_course = os.path.join('Contents', name)
 
     # os.walk Returns [folder_name, sub_folders, sub_files]
     for temp_folder, _, files in os.walk(temp_course):
@@ -150,10 +144,8 @@ def merge_to_main(temp_course, name):
         print('  Merging Folder {}...'.format(rel_path))
         # print('  Files Present: {}'.format(files))    # Disabled. Too Long
 
-        main_folder = '{0}/{1}'.format(
-            main_course,
-            '/'.join(temp_folder.split('/')[2:])
-        )
+        main_folder = os.path.join(main_course,
+                                   '/'.join(temp_folder.split('/')[2:]))
 
         pathlib.Path(main_folder).mkdir(parents=True, exist_ok=True)
 

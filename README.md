@@ -1,4 +1,5 @@
 #   BBDownload – BeachBoard Content Downloader
+<!-- FIND THE GAME... -->
 This short script grabs all files from BeachBoard @ CSULB (hopefully),
 unless the system breaks (which occurs often) or have some major changes.
 
