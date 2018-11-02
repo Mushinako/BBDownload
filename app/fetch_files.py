@@ -95,13 +95,19 @@ def merge_file(rel_path, file, temp_folder, main_folder):
     main_file = re.sub('\s+\(\d+\).', '.', os.path.join(main_folder, file)
                        ).strip().replace('//', '/')
 
+    # Always Overwrite the Contents
+    if file == 'Table of Contents.html':
+        if os.path.isfile(main_file):
+            os.remove(main_file)
+
     # Check if File with Same Name Exists
-    if os.path.isfile(main_file):
+    elif os.path.isfile(main_file):
         print('      File Name Collision!')
         f_temp = filedata.FileData(temp_file)
         f_main = filedata.FileData(main_file)
 
         if check_collision(f_temp, f_main, temp_file):
+            print('      File Hash Collision!')
             return
 
         # If Same File Name with Different Sizes/Hashes
