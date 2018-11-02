@@ -23,14 +23,16 @@ name (possibly different versions) will be renamed by attaching " (1)",
 
 ##  Usage
 ### On Windows:
-- Double-click on `app.bat` or run `.\app.bat [-h|-c|-r]` from command line
+- Double-click on `bbdownload.bat` or run `.\app.bat [-h|-c|-r]` from command
+  line
 
 ### On Mac OS/Linux:
-- Make `app.sh` executable (`chmod +x ./app.sh`)
-- Open a terminal in this folder and run `./app.sh [-h|-c|-r]` from terminal
+- Make `bbdownload.sh` executable (`chmod +x ./app.sh`)
+- Open a terminal in this folder and run `./bbdownload.sh [-h|-c|-r]` from
+  terminal
 
 ### Alternative:
-- Use `python3 app [-h|-c|-r]` in this directory
+- Use `python3 py3bbdownload [-h|-c|-r]` in this directory
 
 
 ## Arguments
