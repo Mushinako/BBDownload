@@ -14,7 +14,7 @@ You also need a password, ideally different from your CSULB password, to
 encrypt the latter in the file. You will need this password EVERY time you
 run this program, as you need to decrypt your CSULB password every time.
 
-All the contents and grades will be written into "Contents" folder.
+All the contents will be written into "Contents" folder.
 
 The same file will not be overwritten, but different files with the same
 name (possibly different versions) will be renamed by attaching " (1)",
@@ -23,13 +23,13 @@ name (possibly different versions) will be renamed by attaching " (1)",
 
 ##  Usage
 ### On Windows:
-- Double-click on `bbdownload.bat` or run `.\app.bat [-h|-c|-r|-t]` from
-  command line
+- Double-click on `bbdownload.bat` or run `.\app.bat [option]` from command
+  line
 
 ### On Mac OS/Linux:
 - Make `bbdownload.sh` executable (`chmod +x ./app.sh`)
-- Open a terminal in this folder and run `./bbdownload.sh [-h|-c|-r|-t]`
-  from terminal
+- Open a terminal in this folder and run `./bbdownload.sh [option]` from
+  terminal
 
 ### Alternative:
 - Use `python3 py3bbdownload [-h|-c|-r|-t]` in this directory
@@ -73,7 +73,8 @@ This program can only accept 1 argument. Any argument other than the first
 
 ##  Future
 * Download Grades Maybe?
-* Print Changes
+* Verbosity Levels?
+
 
 ##  Contributions!
 Absolutely! File an issue and/or start a pull request! This project is likely

@@ -2,7 +2,6 @@
 import re
 import json
 import requests
-
 import defconst
 import pwd
 
@@ -11,18 +10,15 @@ import pwd
 def read_personal_data(json_file):
     with open(json_file, 'r') as pd:
         defconst.data = json.loads(pd.read())
-
     print('Personal Data Successfully Read!')
 
 
 # Decrypt Login Data
 def decrypt_login():
     pwd.create_cipher()
-
     defconst.lg = json.loads(json.dumps(defconst.data['login']))
     defconst.lg['userName'] = defconst.cipher.decrypt(defconst.lg['userName'])
     defconst.lg['password'] = defconst.cipher.decrypt(defconst.lg['password'])
-
     print('Configurations Successfully Decrypted!')
 
 
@@ -47,21 +43,17 @@ def la_cookie():
         b'salesforceliveagent.com/chat\', \'(\w{15})\', \'(\w{15})\'',
         csulb.content
         )
-
     print('LiveAgent Configurations Got!')
-
     la = defconst.session.get(url=defconst.url['liveagent'].format(
         la_id.group(1).decode('utf-8'),
         la_init.group(1).decode('utf-8'),
         la_init.group(2).decode('utf-8')
         ))
-
     ssid = json.loads(la.content[27:-2])['messages'][0]['message']['sessionId']
     la_ck = defconst.la_cookies
     la_ck['liveagent_sid'] = la_ck['liveagent_ptid'] = ssid
     for x in la_ck.items():
         defconst.session.cookies.set(*x)
-
     print('LiveAgent Cookies Added!')
 
 
@@ -69,13 +61,10 @@ def la_cookie():
 def fetch_config(read):
     if read:
         read_personal_data('data/data.json')
-
     defconst.session = requests.Session()
     print('Session Started!')
-
     decrypt_login()
     login = bb_login()
     clear_login()
     la_cookie()
-
     return login
