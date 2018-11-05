@@ -1,7 +1,6 @@
 import os
 import sys
 import shutil
-
 import fetch_config
 import fetch_files
 import fetch_grades
@@ -10,22 +9,18 @@ import conf_setup
 
 def fetch_content():
     if os.path.isfile('data/data.json'):
-        if os.path.isdir('Temp'):
-            shutil.rmtree('Temp')
-
+        if os.path.isdir('.temp'):
+            shutil.rmtree('.temp')
         try:
             fetch_config.fetch_config(True)
             fetch_files.fetch_files()
-
         except Exception as e:
             print(e)
-
         finally:
-            if os.path.isdir('Temp'):
-                shutil.rmtree('Temp')
+            if os.path.isdir('.temp'):
+                shutil.rmtree('.temp')
             print()
             return
-
     print('Configuration Data not Found')
     print('Setting up...\n')
     conf_setup.setup(False)
@@ -80,50 +75,46 @@ def main():  # TODO: Other implementations
     '''
 
     os.system('cls' if os.name == 'nt' else 'clear')
-
     if len(sys.argv) == 1:
         conf_setup.setup(os.path.isfile('data/data.json'))
         fetch_content()
         fetch_grades.fetch_grades(1, False)
         return
-
-    elif sys.argv[1] in ['-h', '--help']:
+    if sys.argv[1] in ['-h', '--help']:
         print(HELP)
         return
-
-    elif sys.argv[1] in ['-c', '--course']:
+    if sys.argv[1] in ['-c', '--course']:
         fetch_content()
         fetch_grades.fetch_grades(1, False)
         return
-
-    elif sys.argv[1] in ['-r', '--reset']:
+    if sys.argv[1] in ['-r', '--reset']:
         conf_setup.setup(False)
         return
-
-    elif sys.argv[1] in ['-t', '--content']:
+    if sys.argv[1] in ['-t', '--content']:
         fetch_content()
         return
-
-    elif sys.argv[1] in ['-g', '--grade']:
+    if sys.argv[1] in ['-g', '--grade']:
         if len(sys.argv) > 3:
             if sys.argv[2] == 'csv':
                 fetch_grades.fetch_grades(0, True)
                 return
-            elif sys.argv[2] == 'md':
+            if sys.argv[2] == 'md':
                 fetch_grades.fetch_grades(1, True)
                 return
-
-    elif sys.argv[1] in ['-a', '--all']:
+            print('Wrong Grade Format!')
+            return
+    if sys.argv[1] in ['-a', '--all']:
         if len(sys.argv) > 3:
             if sys.argv[2] == 'csv':
                 fetch_content()
                 fetch_grades.fetch_grades(0, False)
                 return
-            elif sys.argv[2] == 'md':
+            if sys.argv[2] == 'md':
                 fetch_content()
                 fetch_grades.fetch_grades(1, False)
                 return
-
+            print('Wrong Grade Format!')
+            return
     print('Invalid arguments! Use \'-h\' for help!')
 
 

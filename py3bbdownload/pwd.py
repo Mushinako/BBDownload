@@ -42,13 +42,11 @@ def check_pw(pw_hash):
     pw = getpass.getpass('Decrypt Your Credentials: ').encode('utf-8')
     hashed = pw_hash.encode('utf-8')
     print()
-
     if hashed == bcrypt.hashpw(pw, hashed):
         return pw
-    else:
-        print('Password No Match!')
-        print('Make Sure You Use the Password Set Up in This App!')
-        sys.exit()
+    print('Password No Match!')
+    print('Make Sure You Use the Password Set Up in This App!')
+    sys.exit()
 
 
 # Create and Return Cipher
@@ -66,10 +64,8 @@ def create_pw():
             'Think of a Password to Encrypt Your Login Crendentials: '
             )).encode('utf-8')
         hashed = bcrypt.hashpw(pw1, bcrypt.gensalt())
-
         pw2 = getpass.getpass('Now Think of That Password Again: '
                               ).encode('utf-8')
-
         # If Passwords Match, Yay!
         if hashed == bcrypt.hashpw(pw2, hashed):
             print('Password Set up!\n')

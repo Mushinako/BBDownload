@@ -23,12 +23,12 @@ name (possibly different versions) will be renamed by attaching " (1)",
 
 ##  Usage
 ### On Windows:
-- Double-click on `bbdownload.bat` or run `.\app.bat [-h|-c|-r]` from command
+- Double-click on `bbdownload.bat` or run `.\app.bat [option]` from command
   line
 
 ### On Mac OS/Linux:
 - Make `bbdownload.sh` executable (`chmod +x ./app.sh`)
-- Open a terminal in this folder and run `./bbdownload.sh [-h|-c|-r]` from
+- Open a terminal in this folder and run `./bbdownload.sh [option]` from
   terminal
 
 ### Alternative:
@@ -76,7 +76,6 @@ This program can only accept 1 argument. Any argument other than the first
 
 ##  Future
 * Download Grades Maybe?
-* Print Changes
 
 
 ##  Contributions!
