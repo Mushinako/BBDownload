@@ -1,5 +1,6 @@
 Contents/
-Temp/
+.temp/
 */__pycache__/
 data/
 temp.*
+puzzle-solution/
