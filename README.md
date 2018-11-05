@@ -76,7 +76,7 @@ This program can only accept 1 argument. Any argument other than the first
 
 ##  Future
 * Download Grades Maybe?
-* Auto-Refresh After Failure
+* Print Changes
 
 
 ##  Contributions!

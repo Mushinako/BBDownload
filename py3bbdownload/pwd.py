@@ -27,7 +27,8 @@ class AESCipher:
         c = AES.new(self.key, AES.MODE_CBC, data[:AES.block_size])
         return self._unpad(c.decrypt(data[AES.block_size:])).decode('utf-8')
 
-    def _pad(self, data):
+    @staticmethod
+    def _pad(data):
         k = AES.block_size - len(data) % AES.block_size
         return data + k * chr(k)
 
