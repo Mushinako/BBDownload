@@ -48,8 +48,6 @@ default               Refresh the URLs and download contents and MD-formatted
                         need to re-setup. You'll have to do this if you lose
                         your passphrase for this app
 -t/--content          Download contents only
--g/--grade [format]   Download grades only. Result would be in selected format.
-                        See formats below
 -a/--all [format]     Download contents and grades in selected format
 ```
 
@@ -76,8 +74,7 @@ This program can only accept 1 argument. Any argument other than the first
 
 ##  Future
 * Download Grades Maybe?
-* Auto-Refresh After Failure
-
+* Print Changes
 
 ##  Contributions!
 Absolutely! File an issue and/or start a pull request! This project is likely

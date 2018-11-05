@@ -67,8 +67,6 @@ def main():  # TODO: Other implementations
                               will need to re-setup. You'll have to do this if
                               you lose your passphrase for this app
       -t/--content          Download contents only
-      -g/--grade [format]   Download grades only. Result would be in selected
-                              format. See formats below
       -a/--all [format]     Download contents and grades in selected format
 
     FORMATS:

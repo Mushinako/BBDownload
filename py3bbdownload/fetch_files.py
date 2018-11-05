@@ -107,7 +107,6 @@ def merge_file(rel_path, file, temp_folder, main_folder):
         f_main = filedata.FileData(main_file)
 
         if check_collision(f_temp, f_main, temp_file):
-            print('      File Hash Collision!')
             return
 
         # If Same File Name with Different Sizes/Hashes
