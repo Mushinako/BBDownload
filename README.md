@@ -23,16 +23,16 @@ name (possibly different versions) will be renamed by attaching " (1)",
 
 ##  Usage
 ### On Windows:
-- Double-click on `bbdownload.bat` or run `.\app.bat [-h|-c|-r]` from command
-  line
+- Double-click on `bbdownload.bat` or run `.\app.bat [-h|-c|-r|-t]` from
+  command line
 
 ### On Mac OS/Linux:
 - Make `bbdownload.sh` executable (`chmod +x ./app.sh`)
-- Open a terminal in this folder and run `./bbdownload.sh [-h|-c|-r]` from
-  terminal
+- Open a terminal in this folder and run `./bbdownload.sh [-h|-c|-r|-t]`
+  from terminal
 
 ### Alternative:
-- Use `python3 py3bbdownload [-h|-c|-r]` in this directory
+- Use `python3 py3bbdownload [-h|-c|-r|-t]` in this directory
 
 
 ## Arguments
@@ -48,7 +48,6 @@ default               Refresh the URLs and download contents and MD-formatted
                         need to re-setup. You'll have to do this if you lose
                         your passphrase for this app
 -t/--content          Download contents only
--a/--all [format]     Download contents and grades in selected format
 ```
 
 ### Formats
