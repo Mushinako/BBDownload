@@ -2,6 +2,8 @@
 <!-- FIND THE GAME... -->
 This short script grabs all files from BeachBoard @ CSULB (hopefully),
 unless the system breaks (which occurs often) or have some major changes.
+**Please only test this script if you understand what you and this script
+are doing!**
 
 
 ## Description
@@ -85,5 +87,3 @@ buggy, and supports are greatly welcomed!
 This project is distributed under GPLv3 by Mushinako. This project comes
 with absolutely NO warranty, and I am NOT responsible for any data loss
 and/or leak. I'm not an expert on data security (though trying to be).
-**Please only test this script if you understand what you and this script
-are doing!**
