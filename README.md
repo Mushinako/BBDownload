@@ -49,17 +49,7 @@ default               Refresh the URLs and download contents and MD-formatted
 -r/--reset            Force reset. "data.json" will be deleted and you will
                         need to re-setup. You'll have to do this if you lose
                         your passphrase for this app
--t/--content          Download contents only
 ```
-
-### Formats
-```
-csv       Comma-separated values (Openable in Excel, LibreOffice Calc)
-md        GitHub flavored markdown (Openable in text editors)
-```
-
-This program can only accept 1 argument. Any argument other than the first
-  one will be ignored
 
 
 ##  Requirement
