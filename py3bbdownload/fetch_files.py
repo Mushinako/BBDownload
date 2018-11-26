@@ -40,7 +40,6 @@ def dl_content(temp_course, name, dl_url):
             z.extractall(temp_course)
     except zipfile.BadZipFile:
         print('    Content for {} is not a ZipFile!'.format(name))
-        print('      Try Refreshing URLs with -c')
     else:
         print('  Contents Extracted!')
     finally:
