@@ -51,7 +51,7 @@ def main():  # TODO: Other implementations
 
     ARGUMENTS:
       default               Refresh the URLs and download contents and
-                            MD-formatted grades
+                            CSV-formatted grades
       -h/--help             Show this text
       -c/--course           Do not refresh course URLs. If the instructor
                               changes anything on BeachBoard, the URL would

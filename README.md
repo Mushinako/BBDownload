@@ -39,7 +39,7 @@ name (possibly different versions) will be renamed by attaching " (1)",
 
 ## Arguments
 ```
-default               Refresh the URLs and download contents and MD-formatted
+default               Refresh the URLs and download contents and CSV-formatted
                         grades
 -h/--help             Show this text
 -c/--course           Do not refresh course URLs. If the instructor changes
