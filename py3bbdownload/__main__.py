@@ -50,8 +50,7 @@ def main():  # TODO: Other implementations
       " (2)", etc.
 
     ARGUMENTS:
-      default               Refresh the URLs and download contents and
-                            MD-formatted grades
+      default               Refresh the URLs and download contents
       -h/--help             Show this text
       -c/--course           Do not refresh course URLs. If the instructor
                               changes anything on BeachBoard, the URL would
@@ -61,12 +60,6 @@ def main():  # TODO: Other implementations
       -r/--reset            Force reset. "data.json" will be deleted and you
                               will need to re-setup. You'll have to do this if
                               you lose your passphrase for this app
-      -t/--content          Download contents only
-      -a/--all [format]     Download contents and grades in selected format
-
-    FORMATS:
-      csv       Comma-separated values (Openable in Excel, LibreOffice Calc)
-      md        GitHub flavored markdown (Openable in text editors)
 
     This program can only accept 1 argument. Any argument other than the first
       one will be ignored
@@ -76,43 +69,44 @@ def main():  # TODO: Other implementations
     if len(sys.argv) == 1:
         conf_setup.setup(os.path.isfile('data/data.json'))
         fetch_content()
-        fetch_grades.fetch_grades(1, False)
+        # fetch_grades.fetch_grades(1, False)
         return
     if sys.argv[1] in ['-h', '--help']:
         print(HELP)
         return
     if sys.argv[1] in ['-c', '--course']:
         fetch_content()
-        fetch_grades.fetch_grades(1, False)
+        # fetch_grades.fetch_grades(1, False)
         return
     if sys.argv[1] in ['-r', '--reset']:
         conf_setup.setup(False)
         return
-    if sys.argv[1] in ['-t', '--content']:
-        fetch_content()
-        return
-    if sys.argv[1] in ['-g', '--grade']:
-        if len(sys.argv) > 3:
-            if sys.argv[2] == 'csv':
-                fetch_grades.fetch_grades(0, True)
-                return
-            if sys.argv[2] == 'md':
-                fetch_grades.fetch_grades(1, True)
-                return
-            print('Wrong Grade Format!')
-            return
-    if sys.argv[1] in ['-a', '--all']:
-        if len(sys.argv) > 3:
-            if sys.argv[2] == 'csv':
-                fetch_content()
-                fetch_grades.fetch_grades(0, False)
-                return
-            if sys.argv[2] == 'md':
-                fetch_content()
-                fetch_grades.fetch_grades(1, False)
-                return
-            print('Wrong Grade Format!')
-            return
+    # TODO: Grades-related
+    # if sys.argv[1] in ['-t', '--content']:
+    #     fetch_content()
+    #     return
+    # if sys.argv[1] in ['-g', '--grade']:
+    #     if len(sys.argv) > 3:
+    #         if sys.argv[2] == 'csv':
+    #             fetch_grades.fetch_grades(0, True)
+    #             return
+    #         if sys.argv[2] == 'md':
+    #             fetch_grades.fetch_grades(1, True)
+    #             return
+    #         print('Wrong Grade Format!')
+    #         return
+    # if sys.argv[1] in ['-a', '--all']:
+    #     if len(sys.argv) > 3:
+    #         if sys.argv[2] == 'csv':
+    #             fetch_content()
+    #             fetch_grades.fetch_grades(0, False)
+    #             return
+    #         if sys.argv[2] == 'md':
+    #             fetch_content()
+    #             fetch_grades.fetch_grades(1, False)
+    #             return
+    #         print('Wrong Grade Format!')
+    #         return
     print('Invalid arguments! Use \'-h\' for help!')
 
 

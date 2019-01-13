@@ -39,8 +39,7 @@ name (possibly different versions) will be renamed by attaching " (1)",
 
 ## Arguments
 ```
-default               Refresh the URLs and download contents and MD-formatted
-                        grades
+default               Refresh the URLs and download contents
 -h/--help             Show this text
 -c/--course           Do not refresh course URLs. If the instructor changes
                         anything on BeachBoard, the URL would change. This app
