@@ -54,15 +54,21 @@ default               Refresh the URLs and download contents
 ##  Requirement
 * Python 3.6+ (May work on 3.5 but I Cannot Guarantee)
 * [pyCryptodome](https://www.pycryptodome.org/en/latest/index.html)
-    * Install with `pip install pycryptodome` or `pip3 install pycryptodome`
-* Necessary Credentials to Log into BeachBoard and Proper Settings
-    * **Pin Your Courses!**
-* Obviously, Internet Connection
-* Disk Space
-* Enough Sanity to Bear the Bugs
+  * Install with `pip install pycryptodome` or `pip3 install pycryptodome`
+* *Optional* [tqdm](https://tqdm.github.io/) and
+  [colorama](https://pypi.org/project/colorama/) for fancy(?) download
+  progress bar
+  * Install with `pip install tqdm colorama` or `pip3 install tqdm colorama`
+* <!-- *** -->N<!-- *** -->ecessary Credentials to Log into BeachBoard and
+  Proper Settings
+  * **Pin Your Courses!**
+* <!-- *** -->O<!-- *** -->bviously, Internet Connection
+* <!-- *** -->D<!-- *** -->isk Space
+* <!-- *** -->E<!-- *** -->nough Sanity to Bear the Bugs
 
 
 ##  Future
+* Arrangement of Files according to Online Structure?
 * Download Grades Maybe?
 * Verbosity Levels?
 
