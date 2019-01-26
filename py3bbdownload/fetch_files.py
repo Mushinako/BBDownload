@@ -2,16 +2,18 @@
 import os
 import sys
 import re
+import math
 import json
 import time
 import pathlib
 import shutil
 import zipfile
 import ctypes
-import pwd
-import defconst
 import filedata
 import importlib
+import pwd
+import defconst as d
+import log as l
 
 HAS_TQDM = (importlib.util.find_spec('tqdm') and (
     os.name!='nt' or importlib.util.find_spec('colorama')
@@ -23,7 +25,7 @@ if HAS_TQDM:
 
 # Decrypt Courses Data
 def decrypt_courses():
-    return json.loads(defconst.cipher.decrypt(defconst.data['courses']))
+    return json.loads(d.cipher.decrypt(d.data['courses']))
 
 
 # Create Folders as Necessary
@@ -36,43 +38,43 @@ def create_dir(name):
 # Content Download
 def dl_content(temp_course, name, dl_url, dl_check):
     if dl_url == '':
-        print('  No Contents!')
+        l.print_log('  No Contents!')
         return
-    print('  Downloading Contents...')
+    l.print_log('  Downloading Contents...')
     i = 2
     while True:
-        status = defconst.session.get(dl_check.format(i))
+        status = d.session.get(dl_check.format(i))
         try:
             stat_text = json.loads(status.content[9:])['Payload']['JobStatus']
         except KeyError:
-            print('    Unprecedented status format!')
+            l.print_log('    Unprecedented status format!')
             break
         else:
             if stat_text == 'Successful':
-                print('    File is ready for download')
+                l.print_log('    File is ready for download')
                 break
             elif stat_text == 'Processing':
                 i += 1
-                print('    Server is packaging files...')
+                l.print_log('    Server is packaging files...')
                 time.sleep(5)
             else:
-                print('    Unprecedented status message!')
-    dl = defconst.session.get(dl_url, stream=True)
+                l.print_log('    Unprecedented status message!')
+    dl = d.session.get(dl_url, stream=True)
     dl_len = dl.headers.get('content-length')
     zip_name = os.path.join(temp_course, name+'.zip')
     MARK_STEP = 5
     with open(zip_name, 'wb') as f:
         if dl_len is None:
-            print('    Downloading...')
+            l.print_log('    Downloading...')
             f.write(dl.content)
         elif HAS_TQDM:
+            l.log('    Downloading, progress with tqdm...')
             for data in tqdm.tqdm(
-                dl.iter_content(4096),
+                dl.iter_content(1024),
                 desc=name,
-                total=int(dl_len)/4096,
+                total=math.ceil(int(dl_len)/10.24)/100,
                 ascii=True,
-                unit='B',
-                unit_scale=4096
+                unit='KiB'
                 ):
                 f.write(data)
         else:
@@ -83,20 +85,20 @@ def dl_content(temp_course, name, dl_url, dl_check):
                 dl_ed += len(data)
                 f.write(data)
                 if dl_ed/dl_len*100 >= dl_mark:
-                    print(f'    Downloaded {dl_mark}%')
+                    l.print_log(f'    Downloaded {dl_mark}%')
                     dl_mark += MARK_STEP
-    print('  Contents Downloaded!')
-    print('  Extracting Contents...')
+    l.print_log('  Contents Downloaded!')
+    l.print_log('  Extracting Contents...')
     try:
         with zipfile.ZipFile(zip_name, 'r') as z:
             z.extractall(temp_course)
     except zipfile.BadZipFile:
-        print(f'    Content for {name} is not a ZipFile!')
+        l.print_log(f'    Content for {name} is not a ZipFile!')
         debug_zip_name = os.path.join('Debug', name)
         shutil.copyfile(zip_name, debug_zip_name)
-        print(f'    Copied tp {debug_zip_name}!')
+        l.print_log(f'    Copied tp {debug_zip_name}!')
     else:
-        print('  Contents Extracted!')
+        l.print_log('  Contents Extracted!')
     finally:
         os.remove(zip_name)
 
@@ -104,37 +106,37 @@ def dl_content(temp_course, name, dl_url, dl_check):
 # Overview Download
 def dl_overview(temp_course, ov_url):
     if ov_url['url'] == '':
-        print('  No Overview!')
+        l.print_log('  No Overview!')
         return
-    print('  Downloading Overview...')
-    ov = defconst.session.get(url=ov_url['url'])
+    l.print_log('  Downloading Overview...')
+    ov = d.session.get(url=ov_url['url'])
     with open(os.path.join(temp_course, ov_url['name']), 'wb') as f:
         f.write(ov.content)
-    print('  Overview Downloaded!')
+    l.print_log('  Overview Downloaded!')
 
 
 # Check File Collision
 def check_collision(f_temp, f_main, temp_file):
     # If File with Same Name Exists, Check Size
     if f_temp.size == f_main.size:
-        # print('      File Size Collision!')   # Disabled. Too long
+        l.log('      File Size Collision!')
         f_temp.hash()
         f_main.hash()
         if None in (f_temp.hashes + f_main.hashes):
-            print('Hash Calculations Failed!')
+            l.print_log('Hash Calculations Failed!')
             sys.exit()
         # If File with Same Size Exists, Check Hash
         if f_temp.hashes == f_main.hashes:
-            # print('      File Hash Collision!')   # Disabled. Too long
+            l.log('      File Hash Collision!')
             os.remove(temp_file)
-            print('      File Merged!')
+            l.print_log('      File Merged!')
             return True
     return False
 
 
 # Copy File and Merge
 def merge_file(rel_path, file, temp_folder, main_folder):
-    print(f'    Merging File {os.path.join(rel_path, file)}...')
+    l.print_log(f'    Merging File {os.path.join(rel_path, file)}...')
     temp_file = os.path.join(temp_folder, file)
     main_file = re.sub('\s+\(\d+\).', '.', os.path.join(main_folder, file)
                        ).strip().replace('//', '/')
@@ -144,7 +146,7 @@ def merge_file(rel_path, file, temp_folder, main_folder):
             os.remove(main_file)
     # Check if File with Same Name Exists
     elif os.path.isfile(main_file):
-        # print('      File Name Collision!')   # Disabled. Too long
+        l.log('      File Name Collision!')
         f_temp = filedata.FileData(temp_file)
         f_main = filedata.FileData(main_file)
         if check_collision(f_temp, f_main, temp_file):
@@ -162,11 +164,11 @@ def merge_file(rel_path, file, temp_folder, main_folder):
                 num += 1
             else:
                 os.rename(temp_file, f)
-                print(f'      File Renamed as {f}!')
+                l.print_log(f'      File Renamed as {f}!')
                 return [1, main_file]
     # Directly Move the File If No File with the Same Name Exists
     os.rename(temp_file, main_file)
-    print('      File Copied!')
+    l.print_log('      File Copied!')
     if file == 'Table of Contents.html':
         return False
     return [0, main_file]
@@ -174,15 +176,15 @@ def merge_file(rel_path, file, temp_folder, main_folder):
 
 # Merge Temp to Contents
 def merge_to_main(temp_course, name):
-    print(f'Merging {name} to Main Folder...')
+    l.print_log(f'Merging {name} to Main Folder...')
     main_course = os.path.join('Contents', name)
     changes = [[], []]  # [new, modified]
     # os.walk Returns [folder_name, sub_folders, sub_files]
     for temp_folder, _, files in os.walk(temp_course):
         temp_folder = temp_folder.replace('\\', '/')
         rel_path = '/'.join(temp_folder.split('/')[1:])
-        print(f'  Merging Folder {rel_path}...')
-        # print(f'  Files Present: {files}')    # Disabled. Too Long
+        l.print_log(f'  Merging Folder {rel_path}...')
+        l.print_log(f'  Files Present: {files}')
         main_folder = os.path.join(
             main_course,
             *temp_folder.split('/')[2:])
@@ -200,25 +202,23 @@ def rmdir_empty():
         for dir_path, dirs, files in os.walk('Contents', topdown=False):
             if not dirs and not files:
                 os.rmdir(dir_path)
-    print('Empty Folders Cleared!')
+    l.print_log('Empty Folders Cleared!')
 
 
 # Fetch Files
 def fetch_files():
     courses = decrypt_courses()
     changes = {}
-    # Make Debug Folder if not exists
-    pathlib.Path('Debug').mkdir(exist_ok=True)
     # Make and Hide Temp Folder
     pathlib.Path('.temp').mkdir()
     if os.name == 'nt':
         if not ctypes.windll.kernel32.SetFileAttributesW('.temp', 0x02):
-            print('Temp Folder not Hidden')
+            l.print_log('Temp Folder not Hidden')
     # Iterate Through Courses
     for course, prop in courses.items():
         print()
         name = prop['name']
-        print(f'Downloading Content for {name}...')
+        l.print_log(f'Downloading Content for {name}...')
         temp_course = create_dir(name)
         dl_content(temp_course, name, prop['dl'], prop['chk'])
         dl_overview(temp_course, prop['info'])
@@ -227,12 +227,12 @@ def fetch_files():
     print()
     rmdir_empty()
     print()
-    print('Changes:')
+    l.print_log('Changes:')
     for course, changes in changes.items():
-        print(' ', course)
-        print('    New:')
+        l.print_log(' ', course)
+        l.print_log('    New:')
         for x in changes[0]:
-            print('     ', x)
-        print('    Modified:')
+            l.print_log('     ', x)
+        l.print_log('    Modified:')
         for x in changes[1]:
-            print('     ', x)
+            l.print_log('     ', x)
