@@ -1,10 +1,13 @@
 import os
 import sys
 import shutil
+import pathlib
+import time
 import fetch_config
 import fetch_files
 import fetch_grades
 import conf_setup
+import log as l
 
 
 def fetch_content():
@@ -15,14 +18,15 @@ def fetch_content():
             fetch_config.fetch_config(True)
             fetch_files.fetch_files()
         except Exception as e:
-            print(e)
+            l.print_log('General exception occurred!')
+            l.print_log(e)
         finally:
             if os.path.isdir('.temp'):
                 shutil.rmtree('.temp')
             print()
             return
-    print('Configuration Data not Found')
-    print('Setting up...\n')
+    l.print_log('Configuration Data not Found')
+    l.print_log('Setting up...\n')
     conf_setup.setup(False)
 
 
@@ -66,49 +70,35 @@ def main():  # TODO: Other implementations
       one will be ignored
     '''
 
-    os.system('cls' if os.name == 'nt' else 'clear')
-    if len(sys.argv) == 1:
-        conf_setup.setup(os.path.isfile('data/data.json'))
-        fetch_content()
-        # fetch_grades.fetch_grades(1, False)
-        return
-    if sys.argv[1] in ['-h', '--help']:
-        print(HELP)
-        return
-    if sys.argv[1] in ['-c', '--course']:
-        fetch_content()
-        # fetch_grades.fetch_grades(1, False)
-        return
-    if sys.argv[1] in ['-r', '--reset']:
-        conf_setup.setup(False)
-        return
-    # TODO: Grades-related
-    # if sys.argv[1] in ['-t', '--content']:
-    #     fetch_content()
-    #     return
-    # if sys.argv[1] in ['-g', '--grade']:
-    #     if len(sys.argv) > 3:
-    #         if sys.argv[2] == 'csv':
-    #             fetch_grades.fetch_grades(0, True)
-    #             return
-    #         if sys.argv[2] == 'md':
-    #             fetch_grades.fetch_grades(1, True)
-    #             return
-    #         print('Wrong Grade Format!')
-    #         return
-    # if sys.argv[1] in ['-a', '--all']:
-    #     if len(sys.argv) > 3:
-    #         if sys.argv[2] == 'csv':
-    #             fetch_content()
-    #             fetch_grades.fetch_grades(0, False)
-    #             return
-    #         if sys.argv[2] == 'md':
-    #             fetch_content()
-    #             fetch_grades.fetch_grades(1, False)
-    #             return
-    #         print('Wrong Grade Format!')
-    #         return
-    print('Invalid arguments! Use \'-h\' for help!')
+    # Make Log Folder if not exists
+    LOG_FOLDER_PATH = os.path.join('Debug', 'Logs')
+    pathlib.Path(LOG_FOLDER_PATH).mkdir(exist_ok=True)
+    with open(os.path.join(LOG_FOLDER_PATH, f'{str(int(time.time()))}.log'),
+              'w') as l.log_file:
+        l.log('This log file includes your system type, your arguments,')
+        l.log('file names, sizes, and hashes in \'Contents\' folder, and')
+        l.log('all program outputs, all which may help debug any problems')
+        l.log('that may occur. It does NOT record any ID\'s, passwords, or')
+        l.log('PINs. These logs are also never automatically uploaded, as I')
+        l.log('do not want to rent a server for this thing.')
+        l.log()
+        l.log(f'OS NAME: {os.name}')
+        l.log(f'ARGS: {str(sys.argv)}')
+        os.system('cls' if os.name == 'nt' else 'clear')
+        if len(sys.argv) == 1:
+            conf_setup.setup(os.path.isfile('data/data.json'))
+            fetch_content()
+            return
+        if sys.argv[1] in ['-h', '--help']:
+            print(HELP)
+            return
+        if sys.argv[1] in ['-c', '--course']:
+            fetch_content()
+            return
+        if sys.argv[1] in ['-r', '--reset']:
+            conf_setup.setup(False)
+            return
+        l.print_log('Invalid arguments! Use \'-h\' for help!')
 
 
 if __name__ == '__main__':

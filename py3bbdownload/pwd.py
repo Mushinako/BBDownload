@@ -7,8 +7,8 @@ import bcrypt
 import getpass
 from Crypto import Random
 from Crypto.Cipher import AES
-
-import defconst
+import defconst as d
+import log as l
 
 
 class AESCipher:
@@ -44,15 +44,15 @@ def check_pw(pw_hash):
     print()
     if hashed == bcrypt.hashpw(pw, hashed):
         return pw
-    print('Password No Match!')
-    print('Make Sure You Use the Password Set Up in This App!')
+    l.print_log('Password No Match!')
+    l.print_log('Make Sure You Use the Password Set Up in This App!')
     sys.exit()
 
 
 # Create and Return Cipher
 def create_cipher():
-    if defconst.cipher is None:
-        defconst.cipher = AESCipher(check_pw(defconst.data['hash']))
+    if d.cipher is None:
+        d.cipher = AESCipher(check_pw(d.data['hash']))
 
 
 # Create Password
@@ -68,8 +68,8 @@ def create_pw():
                               ).encode('utf-8')
         # If Passwords Match, Yay!
         if hashed == bcrypt.hashpw(pw2, hashed):
-            print('Password Set up!\n')
-            defconst.cipher = AESCipher(pw2)
+            l.print_log('Password Set up!\n')
+            d.cipher = AESCipher(pw2)
             return hashed
-        print('Password No Match!\n')
+        l.print_log('Password No Match!\n')
         os.system('cls' if os.name == 'nt' else 'clear')

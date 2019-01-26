@@ -29,8 +29,8 @@ name (possibly different versions) will be renamed by attaching " (1)",
   line
 
 ### On Mac OS/Linux:
-- Make `bbdownload.sh` executable (`chmod +x ./app.sh`)
-- Open a terminal in this folder and run `./bbdownload.sh [option]` from
+- Make `bbdownload` executable (`chmod +x ./bbdownload`)
+- Open a terminal in this folder and run `./bbdownload [option]` from
   terminal
 
 ### Alternative:
