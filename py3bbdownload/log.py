@@ -2,10 +2,11 @@
 log_file = None
 
 def print_log(*args, sep=' ', end='\n'):
-    log_file.write(sep.join(args)+end)
+    a = [str(arg) for arg in args]
+    log_file.write(sep.join(a)+end)
     log_file.flush()
-    print(*args, sep=sep, end=end)
+    print(*a, sep=sep, end=end)
 
 def log(*args, sep=' ', end='\n'):
-    log_file.write(sep.join(args)+end)
+    log_file.write(sep.join([str(a) for a in args])+end)
     log_file.flush()

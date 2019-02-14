@@ -115,12 +115,15 @@ def get_ov(id_cour):
     ov_id = re.search(
         'data-title=\"([\w\_\.]+)\"',
         json.loads(ov_btn.content[9:])['Payload']['Html']
-        ).group(1)
-    l.print_log('    Overview URL Got!')
-    return {
-        'url' : url_ov,
-        'name': ov_id,
-        }
+        )
+    if ov_id:
+        l.print_log('    Overview URL Got!')
+        return {
+            'url' : url_ov,
+            'name': ov_id.group(1),
+            }
+    l.print_log('    No Overview!')
+    return {'url' : '', 'name': ''}
 
 
 # Get Info for Each Course
