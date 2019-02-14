@@ -182,7 +182,7 @@ def merge_to_main(temp_course, name):
     # os.walk Returns [folder_name, sub_folders, sub_files]
     for temp_folder, _, files in os.walk(temp_course):
         temp_folder = temp_folder.replace('\\', '/')
-        rel_path = '/'.join(temp_folder.split('/')[1:])
+        rel_path = os.path.join(*temp_folder.split('/')[1:])
         l.print_log(f'  Merging Folder {rel_path}...')
         l.print_log(f'  Files Present: {files}')
         main_folder = os.path.join(

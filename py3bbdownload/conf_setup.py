@@ -81,7 +81,6 @@ def get_dl(id_cour):
     dl_btn = d.session.get(d.url['dl_btn'].format(id_cour))
     try:
         dl_candid = json.loads(dl_btn.content[9:])['Data']['OR']['__g2']
-        # dl_id = json.loads(dl_candid['1'])['P'][0]['P'][1]['P'][0]['Value']
         dl_id = re.search(
             'openerId=(d2l_[0-9_]+)\\\\\"',
             json.dumps(dl_candid)
@@ -116,12 +115,15 @@ def get_ov(id_cour):
     ov_id = re.search(
         'data-title=\"([\w\_\.]+)\"',
         json.loads(ov_btn.content[9:])['Payload']['Html']
-        ).group(1)
-    l.print_log('    Overview URL Got!')
-    return {
-        'url' : url_ov,
-        'name': ov_id,
-        }
+        )
+    if ov_id:
+        l.print_log('    Overview URL Got!')
+        return {
+            'url' : url_ov,
+            'name': ov_id.group(1),
+            }
+    l.print_log('    No Overview!')
+    return {'url' : '', 'name': ''}
 
 
 # Get Info for Each Course
