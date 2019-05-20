@@ -9,10 +9,10 @@ are doing!** This is a mere script to comply with my laziness to check BB.
 **Please pin your courses that you would like to be downloaded.**
 
 When first run, this program will ask you for your credentials. You also need
-a passphrase **different** from your CSULB password, to encrypt the latter in
-a file named `data.json` in `data` folder. You will need this passphrase
-**every** time you run this program, as you need to decrypt your CSULB
-password every time for security purposes.
+a passphrase **different** from your CSULB password (e.g., `1234`, though not
+recommended), to encrypt the latter in a file named `data.json` in `data`
+folder. You will need this passphrase **every** time you run this program, as
+you need to decrypt your CSULB password every time for security purposes.
 
 All the contents will be written into `contents` folder.
 
