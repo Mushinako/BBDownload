@@ -1,3 +1,3 @@
 @echo off
-py py3bbdownload %*
+py -3 py3bbdownload %*
 pause

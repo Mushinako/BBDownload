@@ -3,83 +3,73 @@
 This short script grabs all files from BeachBoard @ CSULB (hopefully),
 unless the system breaks (which occurs often) or have some major changes.
 **Please only test this script if you understand what you and this script
-are doing!**
+are doing!** This is a mere script to comply with my laziness to check BB.
 
-
-## Description
+##  Description
 **Please pin your courses that you would like to be downloaded.**
 
-When first run, this program will ask you for your credentials, and a file
-  named "data.json" should appear in "data" folder, storing necessary data.
+When first run, this program will ask you for your credentials. You also need
+a passphrase **different** from your CSULB password, to encrypt the latter in
+a file named `data.json` in `data` folder. You will need this passphrase
+**every** time you run this program, as you need to decrypt your CSULB
+password every time for security purposes.
 
-You also need a password, ideally different from your CSULB password, to
-encrypt the latter in the file. You will need this password EVERY time you
-run this program, as you need to decrypt your CSULB password every time.
-
-All the contents will be written into "Contents" folder.
+All the contents will be written into `contents` folder.
 
 The same file will not be overwritten, but different files with the same
-name (possibly different versions) will be renamed by attaching " (1)",
-" (2)", etc.
-
+name (possibly different versions) will be renamed by attaching the time of
+retrieval.
 
 ##  Usage
 ### On Windows:
-- Double-click on `bbdownload.bat` or run `.\app.bat [option]` from command
-  line
+- Double-click on `bbdownload.bat` or run `.\bbdownload.bat [option]` from
+  command line
 
-### On Mac OS/Linux:
-- Make `bbdownload` executable (`chmod +x ./bbdownload`)
+### On macOS/Linux:
+- Make `bbdownload` executable (`chmod +x ./bbdownload`) (Optional)
 - Open a terminal in this folder and run `./bbdownload [option]` from
   terminal
 
 ### Alternative:
-- Use `python3 py3bbdownload [-h|-c|-r|-t]` in this directory
+- Use `python3 py3bbdownload [option]` in this directory
 
-
-## Arguments
+##  Arguments
 ```
-default               Refresh the URLs and download contents and CSV-formatted
-                        grades
--h/--help             Show this text
--c/--course           Do not refresh course URLs. If the instructor changes
-                        anything on BeachBoard, the URL would change. This app
-                        defaults to refreshing the URLs each time. Use this
-                        option to disable such behavior.
--r/--reset            Force reset. "data.json" will be deleted and you will
-                        need to re-setup. You'll have to do this if you lose
-                        your passphrase for this app
+default           Refresh URLs and download contents
+-h/--help         Show this text and exit program
+-v/--verbose      Trigger for verbose terminal output
+-r/--reset        Force reset. "data.json" will be deleted and you will need
+                    to re-setup. You'll have to do this if you lose your
+                    passphrase for this app
 ```
-
 
 ##  Requirement
-* Python 3.6+ (May work on 3.5 but I Cannot Guarantee)
-* [pyCryptodome](https://www.pycryptodome.org/en/latest/index.html)
-  * Install with `pip install pycryptodome` or `pip3 install pycryptodome`
-* *Optional* [tqdm](https://tqdm.github.io/) and
-  [colorama](https://pypi.org/project/colorama/) for fancy(?) download
-  progress bar
-  * Install with `pip install tqdm colorama` or `pip3 install tqdm colorama`
-* <!-- *** -->N<!-- *** -->ecessary Credentials to Log into BeachBoard and
-  Proper Settings
-  * **Pin Your Courses!**
-* <!-- *** -->O<!-- *** -->bviously, Internet Connection
-* <!-- *** -->D<!-- *** -->isk Space
-* <!-- *** -->E<!-- *** -->nough Sanity to Bear the Bugs
+### TL;DR
+`pip3 install bcrypt pycryptodome beautifulsoup4`
 
+### Details
+* Python 3.6+ (Recommended), may work on lower versions of Python 3
+* [bcrypt](https://pypi.org/project/bcrypt/) (For passphrase verification)
+* [pyCryptodome](https://www.pycryptodome.org/en/latest/index.html) (For
+  personal data encryption)
+* [Beautiful Soup](https://www.crummy.com/software/BeautifulSoup/) (For HTML
+  parsing)
+* Necessary Credentials to log into BeachBoard and **pin your courses**!
+* Obviously, internet connection
+* Disk space
+* Enough sanity to bear the bugs
 
-##  Future
-* Arrangement of Files according to Online Structure?
-* Download Grades Maybe?
-* Verbosity Levels?
+It should also be noted that the files should not be opened during the running
+of this script.
 
+##  FAQ
+Some FAQ can be found [here](./faq.md).
 
 ##  Contributions!
 Absolutely! File an issue and/or start a pull request! This project is likely
 buggy, and supports are greatly welcomed!
 
-
 ##  License
-This project is distributed under GPLv3 by Mushinako. This project comes
-with absolutely NO warranty, and I am NOT responsible for any data loss
-and/or leak. I'm not an expert on data security (though trying to be).
+This project is distributed under [GPLv3](./LICENSE) by Mushinako. This project
+comes with absolutely **NO** warranty, and I am **NOT** responsible for any
+data loss and/or leak. I'm **NOT** an expert on data security.

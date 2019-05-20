@@ -1,7 +1,7 @@
-Contents/
-.temp/
-*/__pycache__/
+contents/
+.tmp/
 data/
-temp.*
+logs/
+*/tmp*.*
 puzzle-solution/
-Debug/
+*/__pycache__/
