@@ -66,8 +66,10 @@ of this script.
 Some FAQ can be found [here](./faq.md).
 
 ##  Contributions!
-Absolutely! File an issue and/or start a pull request! This project is likely
-buggy, and supports are greatly welcomed!
+Absolutely, but why would you be interested in this? You are welcomed to file
+an issue and/or start a pull request! This project is likely buggy, and
+supports are greatly welcomed, and I do need to improve my skills as all of
+mine are self-taught.
 
 ##  License
 This project is distributed under [GPLv3](./LICENSE) by Mushinako. This project
