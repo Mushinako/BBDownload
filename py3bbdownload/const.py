@@ -2,8 +2,8 @@
 from os.path import join
 from datetime import datetime
 
-cs = 1024 * 1024    # 1 MiB
-time = datetime.now().strftime('%Y%m%d%H%M%S')
+cs = 1024 * 1024    # Chunck size: 1 MiB
+time = datetime.now().strftime('%Y%m%d%H%M%S')  # Start time
 
 base_url = 'https://bbcsulb.desire2learn.com'
 cnt_url = base_url + '/d2l/le/content/'
@@ -38,6 +38,9 @@ curls = {
     }
 
 
-def plur(num, noun, add='s'):
-    tmp = str(num) + ' ' + noun
-    return tmp if num == 1 else tmp + add
+# Apply proper singular/plural to nouns
+def plur(num, noun, plr=None):
+    if plr is None:
+        plr = noun + 's'
+    tmp = str(num) + ' '
+    return tmp + noun if num == 1 else tmp + plr

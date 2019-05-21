@@ -16,10 +16,10 @@ from log import vprint
 def down(ovs, files):
     v.log_file.plog('-' * 24)
     v.log_file.plog('Downloading files...')
-    fai = []
-    new = []
-    upd = []
-    tot = 0
+    fai = []    # List of failed downloads
+    new = []    # List of new files
+    upd = []    # List of updated files
+    tot = 0     # Total file size
     # Download overviews
     tl = len(ovs) + len(files)
     fi = 0
