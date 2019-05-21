@@ -45,11 +45,13 @@ default           Refresh URLs and download contents
 
 ##  Requirement
 ### TL;DR
-`pip3 install bcrypt pycryptodome beautifulsoup4`
+`pip3 install -r requirements.txt` or
+`pip3 install requests bcrypt pycryptodome beautifulsoup4`
 
 ### Details
 * Python 3.6+ (Recommended), may work on lower versions of Python 3
-* [bcrypt](https://pypi.org/project/bcrypt/) (For passphrase verification)
+* [requests](https://2.python-requests.org/en/master/) (For web communications)
+* [bcrypt](https://github.com/pyca/bcrypt/) (For passphrase verification)
 * [pyCryptodome](https://www.pycryptodome.org/en/latest/index.html) (For
   personal data encryption)
 * [Beautiful Soup](https://www.crummy.com/software/BeautifulSoup/) (For HTML
