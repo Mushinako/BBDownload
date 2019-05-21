@@ -1,3 +1,3 @@
 #!/usr/bin/env python3
 author = 'Mushinako'
-version = '2.beta.1'
+version = '3.beta.2'
