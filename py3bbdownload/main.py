@@ -43,8 +43,9 @@ default           Refresh URLs and download contents
 
 # Main interface
 def main():
+    srt = time()
+    mid = end = 0
     try:
-        srt = time()
         # Initiate logs
         log_init()
         # Make folders
@@ -67,18 +68,19 @@ def main():
         mid = time()
         # Download files
         down(ovs, files)
-        end = time()
-        print('-' * 24)
-        print('Total time:', *for_t(end-srt))
-        print('  Fetch configurations:', *for_t(mid-srt))
-        print('  Downloads           :', *for_t(end-mid))
     except Exception as e:
         g_err(99, 'General error', 'An error occurred!', err=e)
     finally:
+        end = time()
         # Remove temp folder
         temp = cdirs['tmp_folder']
         if os.path.isdir(temp):
             rmtree(temp)
+        print('-' * 24)
+        print('Total time:', *for_t(end-srt))
+        if mid:
+            print('  Fetch configurations:', *for_t(mid-srt))
+            print('  Downloads           :', *for_t(end-mid))
 
 
 def for_t(time):

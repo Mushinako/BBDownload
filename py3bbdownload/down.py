@@ -64,7 +64,7 @@ def df(file, func, fails, new, upd, tot, fi, tl):
     path_tmp = os.path.join(file.folder, file_tmp)
     if success:
         suc_msg = ('  ' + file_tmp.format('')
-                   + ' successfully downloaded! ({:.3f})'.format(leng))
+                   + ' successfully downloaded! ({:.3f} MiB)'.format(leng))
         spaces = ' ' * max(get_terminal_size().columns - len(suc_msg), 0)
         print(suc_msg + spaces)
         stat = move_file(file.folder, path_tmp, file_tmp.format(r'-\d{14}'))
