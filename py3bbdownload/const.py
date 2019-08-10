@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-from os.path import join
+import os
+from subprocess import call
 from datetime import datetime
 
 cs = 1024 * 1024    # Chunck size: 1 MiB
@@ -16,10 +17,10 @@ cdirs = {
     }
 
 cfiles = {
-    'data_file': join(cdirs['data_folder'], 'data.json'),
-    'fail_file': join(cdirs['data_folder'], 'fail.txt'),
-    'new_file': join(cdirs['data_folder'], 'new.txt'),
-    'upd_file': join(cdirs['data_folder'], 'upd.txt'),
+    'data_file': os.path.join(cdirs['data_folder'], 'data.json'),
+    'fail_file': os.path.join(cdirs['data_folder'], 'fail.txt'),
+    'new_file': os.path.join(cdirs['data_folder'], 'new.txt'),
+    'upd_file': os.path.join(cdirs['data_folder'], 'upd.txt'),
     }
 
 curls = {
@@ -38,9 +39,24 @@ curls = {
     }
 
 
-# Apply proper singular/plural to nouns
 def plur(num, noun, plr=None):
+    '''Apply proper singular/plural to nouns
+
+    Args:
+        num  (int): The number preceeding the noun
+        noun (str): The noun in question, singular form
+        plr  (str): If non-standard, the noun in question, plural form
+    Returns:
+        (str) The properly-formatted number-noun string
+        E.g.:
+            '5 apples'
+    '''
     if plr is None:
         plr = noun + 's'
     tmp = str(num) + ' '
     return tmp + noun if num == 1 else tmp + plr
+
+
+def clear_scr():
+    '''Clear screen obviously'''
+    call('cls' if os.name == 'nt' else 'clear', shell=True)

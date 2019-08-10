@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 # Self-defined scripts
 import v
 from const import curls
-from err import json_chk, re_chk, get_chk, weird_err
+from err import json_par, json_chk, re_chk, get_chk, weird_err
 
 
 class File:
@@ -67,8 +67,9 @@ class Module:
             curls['module'].format(self._cour_id), 'Mod',
             params={'mId': self._id, 'writeHistoryEntry': 1, }
             )[9:]
-        payload = json_chk('Payload', content_bytes, name='Mod load')
-        content = json_chk('Html', payload, name='Mod html', par=False)
+        payload_j = json_par(content_bytes, 'Mod load')
+        payload = json_chk(('Payload', ), payload_j, name='Mod load')
+        content = json_chk(('Html', ), payload, name='Mod html')
         # Parse original
         soup_content = BeautifulSoup(content, features='html.parser').ul
         soup_list = soup_content.find_all('li', recursive=False)
@@ -119,8 +120,9 @@ class Module:
                     'isInEditAllTitlesMode': False,
                     }
                 )[9:]
-            payload = json_chk('Payload', content_bytes, name='More load')
-            content = json_chk('Html', payload, name='More html', par=False)
+            payload_j = json_par(content_bytes, name='More load')
+            payload = json_chk(('Payload', ), payload_j, name='More load')
+            content = json_chk(('Html', ), payload, name='More html')
             if not content:
                 # No more data
                 return soup_list
@@ -170,8 +172,9 @@ class Course:
         v.log_file.pvlog('-' * 10)
         v.log_file.pvlog('Getting course name')
         info = get_chk(link, 'Course name', headers=v.auth_head)
-        prop = json_chk('properties', info, name='Properties')
-        name = json_chk('name', prop, name='Name', par=False)
+        prop_j = json_par(info, 'Properties')
+        prop = json_chk(('properties', ), prop_j, name='Properties')
+        name = json_chk(('name', ), prop, name='Name')
         self._name = safe_name(name)
         v.log_file.pvlog('Course name got')
 

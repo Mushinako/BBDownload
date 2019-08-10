@@ -9,6 +9,7 @@ from pswd import check_pp, create_pp
 
 
 def setup():
+    '''Prompt user for credentials and save into file'''
     v.log_file.pvlog('-'*20)
     v.log_file.pvlog('Start setup')
     # Get passphrase
@@ -27,12 +28,15 @@ def setup():
 
 
 def check():
+    '''Check passphrase against saved copy (hashed)'''
     v.log_file.pvlog('-'*20)
     v.log_file.pvlog('Checking passphrase')
+    # Load saved passphrase
     with open(cfiles['data_file']) as f:
         data = loads(f.read())
     # Prompt for passphrase
     cipher = check_pp(data['hash'].encode('utf-8'))
+    # Decrypt ID and password
     v.clogin_info['userName'] = cipher.decrypt(data['id'])
     v.clogin_info['password'] = cipher.decrypt(data['pw'])
     v.log_file.plog('Credentials decrypted!')
