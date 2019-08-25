@@ -90,7 +90,7 @@ def json_chk(key, json, *msg, name=None, add=None):
     '''JSON key check (ERRNO -2)
 
     Args:
-        key  (str|int)   : Keys to be retrieved
+        key  (str|int)   : Key to be retrieved
         json (Dict)      : Parsed JSON
         msg  (Tuple[str]): See `g_err()`
         name (str)       : Identifier for debugging

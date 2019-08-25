@@ -45,7 +45,7 @@ def login():
     v.log_file.pvlog('-' * 20)
     v.log_file.pvlog('Start login')
     # Try logging in and get response
-    login = post_chk(curls['login'], v.clogin_info, 'login')
+    login = post_chk(curls['login'], v.clogin_info, 'login')[1]
     # Clear login info (though may not work)
     v.login_info = None
     gc.collect()
@@ -66,12 +66,12 @@ def auth(xsrf):
     v.log_file.pvlog('Start auth')
     # Token
     token_req = post_chk(curls['token'], {'scope': '*:*:*', }, 'token',
-                         headers={'x-csrf-token': xsrf, })
+                         headers={'x-csrf-token': xsrf, })[1]
     token_j = json_par(token_req, 'Auth token')
     token = json_chk('access_token', token_j).encode('utf-8')
     v.log_file.pvlog('Got auth token')
     # Authorization header
-    bsi = get_chk(curls['bsi'], 'bsi')
+    bsi = get_chk(curls['bsi'], 'bsi')[1]
     auth_pre = re_chk(br'Authorization:`([\w ]+)\$\{token\}`', bsi,
                       'auth_pre')[1]
     v.log_file.pvlog('Got auth prefix')
@@ -94,7 +94,7 @@ def courses(user_id):
     all_courses_req = get_chk(
         curls['courses']+user_id, 'course list',
         headers=v.auth_head, params={'embedDepth': 1, }
-        )
+        )[1]
     courses_j = json_par(all_courses_req, 'All courses')
     all_courses = json_chk('entities', courses_j)
     pin_courses = []

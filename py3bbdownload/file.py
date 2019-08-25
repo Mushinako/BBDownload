@@ -66,10 +66,10 @@ class Module:
         content_bytes = get_chk(
             curls['module'].format(self._cour_id), 'Mod',
             params={'mId': self._id, 'writeHistoryEntry': 1, }
-            )[9:]
+            )[1][9:]
         payload_j = json_par(content_bytes, 'Mod load')
-        payload = json_chk(('Payload', ), payload_j, name='Mod load')
-        content = json_chk(('Html', ), payload, name='Mod html')
+        payload = json_chk('Payload', payload_j, name='Mod load')
+        content = json_chk('Html', payload, name='Mod html')
         # Parse original
         soup_content = BeautifulSoup(content, features='html.parser').ul
         soup_list = soup_content.find_all('li', recursive=False)
@@ -171,10 +171,10 @@ class Course:
     def _get_name(self, link):
         v.log_file.pvlog('-' * 10)
         v.log_file.pvlog('Getting course name')
-        info = get_chk(link, 'Course name', headers=v.auth_head)
+        info = get_chk(link, 'Course name', headers=v.auth_head)[1]
         prop_j = json_par(info, 'Properties')
-        prop = json_chk(('properties', ), prop_j, name='Properties')
-        name = json_chk(('name', ), prop, name='Name')
+        prop = json_chk('properties', prop_j, name='Properties')
+        name = json_chk('name', prop, name='Name')
         self._name = safe_name(name)
         v.log_file.pvlog('Course name got')
 
@@ -183,7 +183,7 @@ class Course:
         v.log_file.pvlog('Getting course URLs')
         content_url = curls['content'].format(self._id)
         v.log_file.pvlog('Course home URL got')
-        content = get_chk(content_url, 'Course home')
+        content = get_chk(content_url, 'Course home')[1]
         v.log_file.pvlog('Course home got')
         # Overview
         self._get_ov(content)
@@ -207,13 +207,16 @@ class Course:
         # Parse URL for all files
         soup_all = BeautifulSoup(content, features='html.parser')
         soup_main = soup_all.find('ul', {'id': 'D2L_LE_Content_TreeBrowser', })
-        soup_blocks = soup_main.find_all('li', recursive=False)[1:]
-        v.log_file.pvlog('Content modules list got')
-        # Parse block recursively
-        modules = self._parse_soup_blocks(soup_blocks, self._path)
+        if soup_main is None:
+            self._modules = []
+        else:
+            soup_blocks = soup_main.find_all('li', recursive=False)[1:]
+            v.log_file.pvlog('Content modules list got')
+            # Parse block recursively
+            modules = self._parse_soup_blocks(soup_blocks, self._path)
+            self._modules = modules
         v.log_file.pvlog('-' * 8)
         v.log_file.pvlog('Content hierachy got')
-        self._modules = modules
 
     def _parse_soup_blocks(self, blocks, parent_path):
         v.log_file.pvlog('-' * 8)

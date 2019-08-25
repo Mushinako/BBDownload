@@ -138,7 +138,7 @@ def file_stream(link, folder, name, ov):
         #   indicate a DNE. Totally normal
         if ov and req.status_code >= 500:
             v.log_file.pvlog('  File does not exist!')
-            return (True, '', 0)
+            return (False, '', 0)
         # 400s indicate a non-downloadable file. Probably a link, webpage, etc.
         if req.status_code >= 400:
             # Unsuccessful request
