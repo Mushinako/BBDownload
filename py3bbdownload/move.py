@@ -48,3 +48,10 @@ def move_file(folder, path_tmp, regex):
     move(tmp_path, cont_path)
     vprint('  New file version!')
     return 1
+
+
+def move_url():
+    '''Move and replace URL files
+
+    Args:
+    '''

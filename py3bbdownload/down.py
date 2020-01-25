@@ -9,7 +9,7 @@ from pathlib import Path
 # Self-defined scripts
 import v
 from const import cs, cfiles, cdirs, plur
-from move import move_file
+from move import move_file, move_url
 from log import vprint
 
 
@@ -112,12 +112,32 @@ def df(file, fai, new, upd, tot, fi, tl, ov):
             upd.append(path_tmp)
         elif stat == 2:
             new.append(path_tmp)
-    # If download unsuccessful, print and add to list of failures
+    # If download unsuccessful, print and add to list of failures and make
+    #   URL file
     else:
         spaces = ' ' * max(get_terminal_size().columns - 18, 0)
+        write_url(file.link, file.folder, file.name)
+        move_url()
         print('  Download failed!' + spaces)
         fai.append(path_tmp)
     return tot+leng
+
+
+def write_url(url, folder, name):
+    '''Write a .url file in case of download failure
+
+    Args:
+        url    (str): URL to be written
+        folder (str): File folder path
+        name   (str): File name w/o extension
+    '''
+    # Create folder recursively
+    tmp_folder = os.path.join(cdirs['tmp_folder'], folder)
+    Path(tmp_folder).mkdir(parents=True, exist_ok=True)
+    # Construct file name
+    file = os.path.join(tmp_folder, name) + '.url'
+    with open(file, 'w') as f:
+        f.write(f'[InternetShortcut]\nURL={url}\nIconIndex=0')
 
 
 def file_stream(link, folder, name, ov):
