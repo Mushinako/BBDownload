@@ -98,7 +98,7 @@ class Module:
         more_ev = int(more_ev_mat[1])
         more_url = curls['more'].format(self._cour_id)
         while True:
-            content_bytes = get_chk(
+            content_raw = get_chk(
                 more_url, 'More',
                 params={
                     'mId': self._id,
@@ -119,10 +119,11 @@ class Module:
                     'itemParams$IsSchedule': False,
                     'isInEditAllTitlesMode': False,
                     }
-                )[9:]
+                )
+            content_bytes = content_raw[1][9:]
             payload_j = json_par(content_bytes, name='More load')
-            payload = json_chk(('Payload', ), payload_j, name='More load')
-            content = json_chk(('Html', ), payload, name='More html')
+            payload = json_chk('Payload', payload_j, name='More load')
+            content = json_chk('Html', payload, name='More html')
             if not content:
                 # No more data
                 return soup_list

@@ -9,4 +9,5 @@ if sys.version_info.major < 3:
     print('Python 3 or later is required! 3.6+ recommended')
     sys.exit(23)
 
-main()
+if __name__ == "__main__":
+    main()
